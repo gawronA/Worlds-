@@ -1,0 +1,121 @@
+﻿// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+struct Vertex
+{
+    float4 position;
+    float3 normal;
+};
+
+float _Size;
+
+int _DensityMap_sizex, _DensityMap_sizey, _DensityMap_sizez;
+float _DensityOffset;
+
+StructuredBuffer<int> _TriangleConnectionTable;
+StructuredBuffer<int> _CubeEdgeFlags;
+StructuredBuffer<float> _DensityMap;
+RWStructuredBuffer<Vertex> _Vertices;
+
+static int2 _EdgeConnections[12] =
+{
+    int2(0, 1), int2(1, 2), int2(2, 3), int2(3, 0),
+	int2(4, 5), int2(5, 6), int2(6, 7), int2(7, 4),
+	int2(0, 4), int2(1, 5), int2(2, 6), int2(3, 7)
+};
+
+static float3 _EdgeDirections[12] =
+{
+    float3(1.0f, 0.0f, 0.0f), float3(0.0f, 1.0f, 0.0f), float3(-1.0f, 0.0f, 0.0f), float3(0.0f, -1.0f, 0.0f),
+	float3(1.0f, 0.0f, 0.0f), float3(0.0f, 1.0f, 0.0f), float3(-1.0f, 0.0f, 0.0f), float3(0.0f, -1.0f, 0.0f),
+	float3(0.0f, 0.0f, 1.0f), float3(0.0f, 0.0f, 1.0f), float3(0.0f, 0.0f, 1.0f), float3(0.0f, 0.0f, 1.0f)
+};
+
+static float3 _VertexOffsets[8] =
+{
+    float3(0.0f, 0.0f, 0.0f), float3(1.0f, 0.0f, 0.0f), float3(1.0f, 1.0f, 0.0f), float3(0.0f, 1.0f, 0.0f),
+	float3(0.0f, 0.0f, 1.0f), float3(1.0f, 0.0f, 1.0f), float3(1.0f, 1.0f, 1.0f), float3(0.0f, 1.0f, 1.0f)
+};
+
+void FillCell(int x, int y, int z, out float cell[8])
+{
+    int _DensityMap_sziexy = _DensityMap_sizex * _DensityMap_sizey;
+    cell[0] = _DensityMap[x + y * _DensityMap_sizex + z * _DensityMap_sziexy];
+    cell[1] = _DensityMap[(x + 1) + y * _DensityMap_sizex + z * _DensityMap_sziexy];
+    cell[2] = _DensityMap[(x + 1) + (y + 1) * _DensityMap_sizex + z * _DensityMap_sziexy];
+    cell[3] = _DensityMap[x + (y + 1) * _DensityMap_sizex + z * _DensityMap_sziexy];
+    cell[4] = _DensityMap[x + y * _DensityMap_sizex + (z + 1) * _DensityMap_sziexy];
+    
+	cell[5] = _DensityMap[(x + 1) + y * _DensityMap_sizex + (z + 1) * _DensityMap_sziexy];
+    cell[6] = _DensityMap[(x + 1) + (y + 1) * _DensityMap_sizex + (z + 1) * _DensityMap_sziexy];
+    cell[7] = _DensityMap[x + (y + 1) * _DensityMap_sizex + (z + 1) * _DensityMap_sziexy];
+}
+
+float CalculateOffset(float v1, float v2)
+{
+    float delta = v2 - v1;
+    return (delta == 0.0f) ? 0.5f : (_DensityOffset - v1) / delta;
+
+}
+
+Vertex CreateVertex(float3 position)
+{
+    Vertex vert;
+    vert.position = float4(position, 1.0f);
+
+    vert.normal = float3(0, 0, 0);
+    return vert;
+}
+
+[numthreads(2, 2, 2)]
+void CSMain(uint3 id : SV_DispatchThreadID)
+{
+    if(id.x >= _DensityMap_sizex - 1 || id.y >= _DensityMap_sizey - 1 || id.z >= _DensityMap_sizez - 1)
+        return;
+    
+	int i;
+    float cube[8];
+    float3 position = float3(id) / _Size;
+    float3 edgeVertex[12];
+
+//fill the cube with density at corners
+    FillCell(id.x, id.y, id.z, cube);
+
+//find whether corner is inside or outside the surface
+    int flagIndex = 0;
+    for(i = 0; i < 8; i++)
+        if(cube[i] <= _DensityOffset)
+            flagIndex |= 1 << i;
+
+//Find which edges are intersected by the surface
+    int edgesFlags = _CubeEdgeFlags[flagIndex];
+	
+//If there is no intersections, return
+    if(!edgesFlags)
+        return;
+
+//Find appropriate edge intersection points
+    for(i = 0; i < 12; i++)
+    {
+        if(edgesFlags & (1 << i))
+        {
+            float offset = CalculateOffset(cube[_EdgeConnections[i].x], cube[_EdgeConnections[i].y]);
+            edgeVertex[i] = position + (_VertexOffsets[_EdgeConnections[i].x] + (offset * _EdgeDirections[i]) * _Size);
+        }
+    }
+
+//Do the triangulation
+    int buffer_index = id.x + id.y * _DensityMap_sizex + id.z * _DensityMap_sizex * _DensityMap_sizey;
+    for(i = 0; i < 5; i++) //up to 5 triangles
+    {
+        if(_TriangleConnectionTable[flagIndex * 16 + 3 * i] >= 0)
+        {
+            float3 vertex_position;
+            vertex_position = edgeVertex[_TriangleConnectionTable[flagIndex * 16 + (3 * i + 0)]];
+            _Vertices[buffer_index * 15 + (3 * i + 0)] = CreateVertex(vertex_position);
+            vertex_position = edgeVertex[_TriangleConnectionTable[flagIndex * 16 + (3 * i + 1)]];
+            _Vertices[buffer_index * 15 + (3 * i + 1)] = CreateVertex(vertex_position);
+            vertex_position = edgeVertex[_TriangleConnectionTable[flagIndex * 16 + (3 * i + 2)]];
+            _Vertices[buffer_index * 15 + (3 * i + 2)] = CreateVertex(vertex_position);
+        }
+    }
+}
