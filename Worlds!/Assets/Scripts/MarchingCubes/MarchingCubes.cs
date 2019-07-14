@@ -2,152 +2,105 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace MarchingCubes
+namespace ProceduralTerrain
 {
-	public class MarchingCubes : MonoBehaviour
+	namespace MarchingCubes
 	{
-		public int m_x_dimension = 64;
-		public int m_y_dimension = 64;
-		public int m_z_dimension = 64;
-		public ComputeShader m_marchingCubesShader;
-		public float m_offset = 0.0f;
-
-		float[] m_densityMap;
-		int m_maxVertices;
-
-		ComputeBuffer m_cubeEdgeFlags, m_traingleConnectionTable;
-		ComputeBuffer m_meshBuffer, m_densityBuffer;
-
-		MeshFilter m_meshFilter;
-		MeshRenderer m_meshRenderer;
-
-		int m_case = 0;
-
-		struct Vertex
+		public class MarchingCubes
 		{
-			public Vector4 position;
-			public Vector3 normal;
-		};
+			public int m_x_dimension;
+			public int m_y_dimension;
+			public int m_z_dimension;
+			public float m_size;
+			public ComputeShader m_marchingCubesShader;
+			public float m_offset = 0.0f;
 
-		void Start()
-		{
-			//each dimension must be divisable by 8
-			//if(m_x_dimension % 8 != 0 || m_y_dimension % 8 != 0 || m_z_dimension % 8 != 0) throw new System.ArgumentException("N must be divisible be 8");
-			m_densityMap = new float[m_x_dimension * m_y_dimension * m_z_dimension];
-			m_maxVertices = (m_x_dimension - 1) * (m_y_dimension - 1) * (m_z_dimension - 1) * 5 * 3; //3 voxels * 5 tris
-			for(int z = 0; z < m_x_dimension; z++)
+			float[] m_densityMap;
+			int m_maxVertices;
+			float[] m_defaultVerticesValues;
+
+			ComputeBuffer m_cubeEdgeFlags, m_traingleConnectionTable;
+			ComputeBuffer m_meshBuffer, m_densityBuffer;
+
+			struct Vertex
 			{
-				for(int y = 0; y < m_y_dimension; y++)
+				public Vector4 position;
+				public Vector3 normal;
+			};
+
+			public void Initalize(int x_dim, int y_dim, int z_dim, float size)
+			{
+				m_x_dimension = x_dim;
+				m_y_dimension = y_dim;
+				m_z_dimension = z_dim;
+				m_size = size;
+
+				//each dimension must be divisable by 8, densitymap and MC shader must be present
+				if(m_x_dimension % 8 != 0 || m_y_dimension % 8 != 0 || m_z_dimension % 8 != 0) throw new System.ArgumentException("x, y or z must be divisible by 8");
+				if(m_marchingCubesShader == null) throw new System.ArgumentException("Missing MarchingCubesShader");
+
+				//max verts
+				m_maxVertices = (m_x_dimension - 1) * (m_y_dimension - 1) * (m_z_dimension - 1) * 5 * 3; //3 voxels * 5 tris
+
+				//Filling with -1 to all the vertices have.w direction -1(which means that it has not been modified)
+				m_defaultVerticesValues = new float[m_maxVertices * 7]; //float4 + float3
+				for(int i = 0; i < m_maxVertices * 7; i++) m_defaultVerticesValues[i] = -1.0f;
+
+				//tables
+				m_cubeEdgeFlags = new ComputeBuffer(256, sizeof(int));
+				m_cubeEdgeFlags.SetData(MarchingCubesTables.CubeEdgeFlags);
+				m_traingleConnectionTable = new ComputeBuffer(256 * 16, sizeof(int));
+				m_traingleConnectionTable.SetData(MarchingCubesTables.TriangleConnectionTable);
+
+				//output mesh. 
+				m_meshBuffer = new ComputeBuffer(m_maxVertices, sizeof(float) * 7);
+
+				//initalize variables in shader
+				m_marchingCubesShader.SetInt("_DensityMap_sizex", m_x_dimension);
+				m_marchingCubesShader.SetInt("_DensityMap_sizey", m_y_dimension);
+				m_marchingCubesShader.SetInt("_DensityMap_sizez", m_z_dimension);
+				m_marchingCubesShader.SetFloat("_DensityOffset", m_offset);
+				m_marchingCubesShader.SetFloat("_Size", m_size);
+				m_marchingCubesShader.SetBuffer(0, "_CubeEdgeFlags", m_cubeEdgeFlags);
+				m_marchingCubesShader.SetBuffer(0, "_TriangleConnectionTable", m_traingleConnectionTable);
+			}
+
+			public Mesh ComputeMesh(float[] densityMap)
+			{
+				if(densityMap.Length == 0) throw new System.ArgumentException("Missing density map");
+				m_densityBuffer.SetData(densityMap);
+				m_meshBuffer.SetData(m_defaultVerticesValues);
+
+				m_marchingCubesShader.SetFloat("_DensityOffset", m_offset);
+				m_marchingCubesShader.SetBuffer(0, "_DensityMap", m_densityBuffer);
+				m_marchingCubesShader.Dispatch(0, m_x_dimension / 8, m_y_dimension / 8, m_z_dimension / 8); //start the magic
+
+				//receive the verts
+				Vertex[] receivedData = new Vertex[m_maxVertices];
+				List<Vector3> vertices = new List<Vector3>();
+				List<int> triangles = new List<int>();
+				Mesh mesh = new Mesh();
+
+				m_meshBuffer.GetData(receivedData);
+				for(int i = 0; i < receivedData.Length && receivedData[i].position.w != -1.0f; i++)
 				{
-					for(int x = 0; x < m_x_dimension; x++)
-					{
-						m_densityMap[x + y * m_x_dimension + z * m_x_dimension * m_y_dimension] = -1.0f;
-						//if(x == 0) m_densityMap[x + y * m_x_dimension + z * m_x_dimension * m_y_dimension] = 1.0f;
-						//else m_densityMap[x + y * m_x_dimension + z * m_x_dimension * m_y_dimension] = 1.0f - (float)(x + 1) / m_x_dimension;
-					}
+					vertices.Add(new Vector3(receivedData[i].position.x, receivedData[i].position.y, receivedData[i].position.z));
+					triangles.Add(i);
 				}
+
+				mesh.SetVertices(vertices);
+				mesh.SetTriangles(triangles, 0);
+				mesh.RecalculateNormals();
+				return mesh;
 			}
-			m_densityMap[0] = 1f;
-			m_densityMap[3] = 1f;
-			m_densityMap[6] = 1f;
-			m_densityBuffer = new ComputeBuffer(m_x_dimension * m_y_dimension * m_z_dimension, sizeof(float));
-			m_densityBuffer.SetData(m_densityMap);
 
-			m_meshFilter = GetComponent<MeshFilter>();
-			m_meshRenderer = GetComponent<MeshRenderer>();
-
-			m_cubeEdgeFlags = new ComputeBuffer(256, sizeof(int));
-			m_cubeEdgeFlags.SetData(MarchingCubesTables.CubeEdgeFlags);
-			m_traingleConnectionTable = new ComputeBuffer(256 * 16, sizeof(int));
-			m_traingleConnectionTable.SetData(MarchingCubesTables.TriangleConnectionTable);
-
-			float[] val = new float[m_maxVertices * 7];	//float4 + float3
-			for(int i = 0; i < m_maxVertices * 7; i++) val[i] = -1.0f;
-			m_meshBuffer = new ComputeBuffer(m_maxVertices, sizeof(float) * 7);
-			m_meshBuffer.SetData(val);
-
-
-			m_marchingCubesShader.SetInt("_DensityMap_sizex", m_x_dimension);
-			m_marchingCubesShader.SetInt("_DensityMap_sizey", m_y_dimension);
-			m_marchingCubesShader.SetInt("_DensityMap_sizez", m_z_dimension);
-			m_marchingCubesShader.SetFloat("_DensityOffset", m_offset);
-			m_marchingCubesShader.SetFloat("_Size", 1.0f);
-			m_marchingCubesShader.SetBuffer(0, "_CubeEdgeFlags", m_cubeEdgeFlags);
-			m_marchingCubesShader.SetBuffer(0, "_TriangleConnectionTable", m_traingleConnectionTable);
-			m_marchingCubesShader.SetBuffer(0, "_DensityMap", m_densityBuffer);
-			m_marchingCubesShader.SetBuffer(0, "_Vertices", m_meshBuffer);
-			m_marchingCubesShader.Dispatch(0, m_x_dimension / 2, m_y_dimension / 2, m_z_dimension / 2);
-
-			Vertex[] verts = new Vertex[m_maxVertices];
-			m_meshBuffer.GetData(verts);
-
-			List<Vector3> vertices = new List<Vector3>();
-			List<int> triangles = new List<int>();
-			Mesh mesh = new Mesh();
-			for(int i = 0; i < verts.Length && verts[i].position.w != -1.0f; i++)
+			public void Release()
 			{
-				vertices.Add(new Vector3(verts[i].position.x, verts[i].position.y, verts[i].position.z));
-				triangles.Add(i);
+				m_cubeEdgeFlags.Release();
+				m_traingleConnectionTable.Release();
+				m_meshBuffer.Release();
+				m_densityBuffer.Release();
 			}
-			mesh.SetVertices(vertices);
-			mesh.SetTriangles(triangles.ToArray(), 0);
-			mesh.RecalculateNormals();
-			m_meshFilter.mesh = mesh;
-
-			Debug.Log("Case: " + m_case.ToString());
-		}
-
-		void Update()
-		{
-			if(Input.GetButtonDown("Jump"))
-			{
-				m_case++;
-				if(m_case > 255) m_case = 0;
-				SetDensityMap(m_case, ref m_densityMap);
-				Triangulate(m_densityMap);
-				Debug.Log("Case: " + m_case.ToString());
-			}
-		}
-
-		void SetDensityMap(int _case, ref float[] densityMap)
-		{
-			for(int i = 0; i < 8; i++)
-			{
-				densityMap[i] = ((_case & 1 << i) > 0) ? 0.5f : -0.5f;
-			}
-		}
-
-		void Triangulate(float[] densityMap)
-		{
-			m_meshFilter.mesh.Clear();
-			List<Vector3> vertices = new List<Vector3>();
-			List<int> triangles = new List<int>();
-			Mesh mesh = new Mesh();
-
-			m_densityBuffer.SetData(densityMap);
-
-			float[] val = new float[m_maxVertices * 7]; //float4 + float3
-			for(int i = 0; i < m_maxVertices * 7; i++) val[i] = -1.0f;
-			m_meshBuffer = new ComputeBuffer(m_maxVertices, sizeof(float) * 7);
-			m_meshBuffer.SetData(val);
-
-			m_marchingCubesShader.SetBuffer(0, "_DensityMap", m_densityBuffer);
-			m_marchingCubesShader.SetBuffer(0, "_Vertices", m_meshBuffer);
-			m_marchingCubesShader.Dispatch(0, m_x_dimension / 2, m_y_dimension / 2, m_z_dimension / 2);
-
-			Vertex[] verts = new Vertex[m_maxVertices];
-			m_meshBuffer.GetData(verts);
-
-			for(int i = 0; i < verts.Length && verts[i].position.w != -1.0f; i++)
-			{
-				vertices.Add(new Vector3(verts[i].position.x, verts[i].position.y, verts[i].position.z));
-				triangles.Add(i);
-			}
-			mesh.SetVertices(vertices);
-			mesh.SetTriangles(triangles.ToArray(), 0);
-			mesh.RecalculateNormals();
-			m_meshFilter.mesh = mesh;
 		}
 	}
-
 }

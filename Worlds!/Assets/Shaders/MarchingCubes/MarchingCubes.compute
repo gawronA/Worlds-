@@ -8,7 +8,7 @@ struct Vertex
 
 float _Size;
 
-int _DensityMap_sizex, _DensityMap_sizey, _DensityMap_sizez;
+uint _DensityMap_sizex, _DensityMap_sizey, _DensityMap_sizez;
 float _DensityOffset;
 
 StructuredBuffer<int> _TriangleConnectionTable;
@@ -66,7 +66,7 @@ Vertex CreateVertex(float3 position)
     return vert;
 }
 
-[numthreads(2, 2, 2)]
+[numthreads(8, 8, 1)]
 void CSMain(uint3 id : SV_DispatchThreadID)
 {
     if(id.x >= _DensityMap_sizex - 1 || id.y >= _DensityMap_sizey - 1 || id.z >= _DensityMap_sizez - 1)

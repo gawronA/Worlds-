@@ -10,54 +10,21 @@ Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: preprocessCompute
-  insize=4302 outsize=4301 ok=1
-Cmd: compileComputeKernel
-  api=4 insize=4301 outsize=6789 ok=1
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
 Cmd: preprocessCompute
   insize=4427 outsize=4426 ok=1
 Cmd: compileComputeKernel
   error: 1 plat 4 at MarchingCubes.compute(72): signed/unsigned mismatch, unsigned assumed
   api=4 insize=4426 outsize=6977 ok=1
 Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
+Cmd: preprocessCompute
+  insize=4427 outsize=4426 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at MarchingCubes.compute(72): signed/unsigned mismatch, unsigned assumed
+  api=4 insize=4426 outsize=6977 ok=1
+Cmd: preprocessCompute
+  insize=4428 outsize=4427 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=4427 outsize=6977 ok=1
 Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: initializeCompiler

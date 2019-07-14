@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Rendering;
 using System.Collections.Generic;
-
+#if(UNITY_EDITOR)
 #pragma warning disable 162
 
 //using ImprovedPerlinNoiseProject;
@@ -254,3 +254,4 @@ namespace MarchingCubesGPUProject
 
 
 
+#endif
