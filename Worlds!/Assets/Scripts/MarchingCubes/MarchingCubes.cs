@@ -54,6 +54,7 @@ namespace ProceduralTerrain
 
 				//output mesh. 
 				m_meshBuffer = new ComputeBuffer(m_maxVertices, sizeof(float) * 7);
+				m_densityBuffer = new ComputeBuffer(m_x_dimension * m_y_dimension * m_z_dimension, sizeof(float));
 
 				//initalize variables in shader
 				m_marchingCubesShader.SetInt("_DensityMap_sizex", m_x_dimension);
@@ -65,18 +66,20 @@ namespace ProceduralTerrain
 				m_marchingCubesShader.SetBuffer(0, "_TriangleConnectionTable", m_traingleConnectionTable);
 			}
 
-			public Mesh ComputeMesh(float[] densityMap)
+			public void ComputeMesh(float[] densityMap)
 			{
-				if(densityMap.Length == 0) throw new System.ArgumentException("Missing density map");
-				m_densityBuffer.SetData(densityMap);
-				m_meshBuffer.SetData(m_defaultVerticesValues);
+				//Do zrobienia! 1. Napisanie shadera który ustawia w buforze dane.
+				//if(densityMap.Length == 0) throw new System.ArgumentException("Missing density map");
+				//m_densityBuffer.SetData(densityMap);
+				//m_meshBuffer.SetData(m_defaultVerticesValues);
 
 				m_marchingCubesShader.SetFloat("_DensityOffset", m_offset);
+				m_marchingCubesShader.SetBuffer(0, "_Vertices", m_meshBuffer);
 				m_marchingCubesShader.SetBuffer(0, "_DensityMap", m_densityBuffer);
-				m_marchingCubesShader.Dispatch(0, m_x_dimension / 8, m_y_dimension / 8, m_z_dimension / 8); //start the magic
-
+				//m_marchingCubesShader.Dispatch(0, m_x_dimension / 8, m_y_dimension / 8, m_z_dimension / 8); //start the magic
+				
 				//receive the verts
-				Vertex[] receivedData = new Vertex[m_maxVertices];
+				/*Vertex[] receivedData = new Vertex[m_maxVertices];
 				List<Vector3> vertices = new List<Vector3>();
 				List<int> triangles = new List<int>();
 				Mesh mesh = new Mesh();
@@ -91,7 +94,12 @@ namespace ProceduralTerrain
 				mesh.SetVertices(vertices);
 				mesh.SetTriangles(triangles, 0);
 				mesh.RecalculateNormals();
-				return mesh;
+				*/
+				/*m_traingleConnectionTable.Release();
+				m_cubeEdgeFlags.Release();
+				m_densityBuffer.Release();
+				m_meshBuffer.Release();
+				//return mesh;*/
 			}
 
 			public void Release()

@@ -18,13 +18,16 @@ public class WorldGenerator : MonoBehaviour
 	void Start ()
 	{
 		mc = new MarchingCubes();
-		mc.Initalize(m_x_dim, m_y_dim, m_z_dim, m_size);
 		mc.m_marchingCubesShader = m_MarchingCubesShader;
+		mc.Initalize(m_x_dim, m_y_dim, m_z_dim, m_size);
+		//mc.m_marchingCubesShader = m_MarchingCubesShader;
 		m_densityMap = new float[m_x_dim * m_y_dim * m_z_dim];
 	}
 	
 	void Update ()
 	{
-		Mesh mesh = mc.ComputeMesh(m_densityMap);
+		//mc.Initalize(m_x_dim, m_y_dim, m_z_dim, m_size);
+		mc.ComputeMesh(m_densityMap);
+		//Mesh mesh = mc.ComputeMesh(m_densityMap);
 	}
 }

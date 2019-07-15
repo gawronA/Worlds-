@@ -246,9 +246,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ad910181f8b1894589fcfafae77d96e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_x_dim: 64
-  m_y_dim: 64
-  m_z_dim: 64
+  m_x_dim: 40
+  m_y_dim: 40
+  m_z_dim: 40
   m_size: 1
   m_MarchingCubesShader: {fileID: 7200000, guid: 5accd0df264625845b084ad3587a684b,
     type: 3}

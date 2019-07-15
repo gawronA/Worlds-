@@ -66,7 +66,7 @@ Vertex CreateVertex(float3 position)
     return vert;
 }
 
-[numthreads(8, 8, 1)]
+[numthreads(8, 8, 8)]
 void CSMain(uint3 id : SV_DispatchThreadID)
 {
     if(id.x >= _DensityMap_sizex - 1 || id.y >= _DensityMap_sizey - 1 || id.z >= _DensityMap_sizez - 1)
