@@ -1,10 +1,17 @@
 Base path: D:/Unity/Editor/Data
 Cmd: initializeCompiler
 Cmd: compileComputeKernel
-  api=4 insize=185 outsize=189 ok=1
-Cmd: compileComputeKernel
-  error: 2 plat 4 at MarchingCubes.compute(7): undeclared identifier 'numthreads'
-  api=4 insize=231 outsize=0 ok=0
+  error: 1 plat 4 at ClearVerticesShader.compute(17): signed/unsigned mismatch, unsigned assumed
+  api=4 insize=653 outsize=901 ok=1
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: initializeCompiler

@@ -1,8 +1,41 @@
 Base path: D:/Unity/Editor/Data
 Cmd: initializeCompiler
 Cmd: initializeCompiler
+Cmd: preprocessCompute
+  insize=4428 outsize=4427 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=4427 outsize=6977 ok=1
 Cmd: initializeCompiler
 Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: preprocessCompute
+  insize=4428 outsize=4427 ok=1
+Cmd: preprocessCompute
+  insize=654 outsize=653 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at ClearVerticesShader.compute(17): signed/unsigned mismatch, unsigned assumed
+  api=4 insize=653 outsize=901 ok=1
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: preprocessCompute
+  insize=654 outsize=653 ok=1
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: preprocessCompute
+  insize=673 outsize=672 ok=1
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: preprocessCompute
+  insize=415 outsize=414 ok=1
+Cmd: preprocessCompute
+  insize=374 outsize=373 ok=1
+Cmd: compileComputeKernel
+  error: 2 plat 4 at FillDensityMapShader.compute(6): '_DensityMap': implicit array missing initial value
+  api=4 insize=373 outsize=0 ok=0
 Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: initializeCompiler

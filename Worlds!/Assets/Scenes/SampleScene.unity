@@ -246,11 +246,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ad910181f8b1894589fcfafae77d96e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_x_dim: 40
-  m_y_dim: 40
-  m_z_dim: 40
+  m_x_dim: 2
+  m_y_dim: 2
+  m_z_dim: 2
   m_size: 1
   m_MarchingCubesShader: {fileID: 7200000, guid: 5accd0df264625845b084ad3587a684b,
+    type: 3}
+  m_FillBufferShader: {fileID: 7200000, guid: f94777e24265ec34190746726e245745, type: 3}
+  m_FillDensityMapShader: {fileID: 7200000, guid: f495cc31bc7d2ab449a5f1146eb2b0fc,
     type: 3}
 --- !u!4 &82847288
 Transform:

@@ -1,0 +1,15 @@
+﻿// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+uint _x, _y, _z;
+
+float _DensityMap[];
+
+RWStructuredBuffer<float> _DensityMapBuffer;
+
+[numthreads(2,2,2)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    uint index = id.x + id.y * _x + id.z * _x * _y;
+    _DensityMapBuffer[index] = _DensityMap[index];
+}

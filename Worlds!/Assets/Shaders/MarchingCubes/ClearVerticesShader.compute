@@ -1,0 +1,26 @@
+﻿// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+struct Vertex
+{
+    float4 position;
+    float3 normal;
+};
+
+uint _x, _y, _z;
+
+RWStructuredBuffer<Vertex> _Vertices;
+
+[numthreads(2,2,2)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    if(id.x >= _x - 1 || id.y >= _y - 1 || id.z >= _z - 1) return;
+    int index = id.x + id.y * (_x - 1) + id.z * (_x - 1) * (_y - 1);
+    for(int i = 0; i < 3 * 5; i++)
+    {
+        Vertex vertex;
+        vertex.position = float4(-1.0f, -1.0f, -1.0f, -1.0f);
+        vertex.normal = float3(0.0f, 0.0f, 0.0f);
+        _Vertices[index * 15 + i] = vertex;
+    }
+}

@@ -13,6 +13,8 @@ namespace ProceduralTerrain
 			public int m_z_dimension;
 			public float m_size;
 			public ComputeShader m_marchingCubesShader;
+			public ComputeShader m_clearBufferShader;
+			public ComputeShader m_fillDensityBufferShader;
 			public float m_offset = 0.0f;
 
 			float[] m_densityMap;
@@ -36,16 +38,13 @@ namespace ProceduralTerrain
 				m_size = size;
 
 				//each dimension must be divisable by 8, densitymap and MC shader must be present
-				if(m_x_dimension % 8 != 0 || m_y_dimension % 8 != 0 || m_z_dimension % 8 != 0) throw new System.ArgumentException("x, y or z must be divisible by 8");
+				//if(m_x_dimension % 8 != 0 || m_y_dimension % 8 != 0 || m_z_dimension % 8 != 0) throw new System.ArgumentException("x, y or z must be divisible by 8");
 				if(m_marchingCubesShader == null) throw new System.ArgumentException("Missing MarchingCubesShader");
 
 				//max verts
-				m_maxVertices = (m_x_dimension - 1) * (m_y_dimension - 1) * (m_z_dimension - 1) * 5 * 3; //3 voxels * 5 tris
+				m_maxVertices = (m_x_dimension - 1) * (m_y_dimension - 1) * (m_z_dimension - 1) * 5 * 3; //3 vertices per 5 tris
 
-				//Filling with -1 to all the vertices have.w direction -1(which means that it has not been modified)
-				m_defaultVerticesValues = new float[m_maxVertices * 7]; //float4 + float3
-				for(int i = 0; i < m_maxVertices * 7; i++) m_defaultVerticesValues[i] = -1.0f;
-
+				//MarchingCubes
 				//tables
 				m_cubeEdgeFlags = new ComputeBuffer(256, sizeof(int));
 				m_cubeEdgeFlags.SetData(MarchingCubesTables.CubeEdgeFlags);
@@ -64,6 +63,16 @@ namespace ProceduralTerrain
 				m_marchingCubesShader.SetFloat("_Size", m_size);
 				m_marchingCubesShader.SetBuffer(0, "_CubeEdgeFlags", m_cubeEdgeFlags);
 				m_marchingCubesShader.SetBuffer(0, "_TriangleConnectionTable", m_traingleConnectionTable);
+
+				//ClearVertices
+				//Filling with -1 to all the vertices have.w direction -1(which means that it has not been modified)
+				m_clearBufferShader.SetInt("_x", m_x_dimension);
+				m_clearBufferShader.SetInt("_y", m_y_dimension);
+				m_clearBufferShader.SetInt("_z", m_z_dimension);
+				m_clearBufferShader.SetBuffer(0, "_Vertices", m_meshBuffer);
+
+				//Fill DensityBuffer
+				//m_fillDensityBufferShader.SetBuffer(0, "_DensityMapBuffer", m_densityBuffer);
 			}
 
 			public void ComputeMesh(float[] densityMap)
@@ -72,10 +81,32 @@ namespace ProceduralTerrain
 				//if(densityMap.Length == 0) throw new System.ArgumentException("Missing density map");
 				//m_densityBuffer.SetData(densityMap);
 				//m_meshBuffer.SetData(m_defaultVerticesValues);
+				
+				//Clear vertices
+				m_clearBufferShader.Dispatch(0, m_x_dimension / 2, m_y_dimension / 2, m_z_dimension / 2);
 
-				m_marchingCubesShader.SetFloat("_DensityOffset", m_offset);
-				m_marchingCubesShader.SetBuffer(0, "_Vertices", m_meshBuffer);
-				m_marchingCubesShader.SetBuffer(0, "_DensityMap", m_densityBuffer);
+				//Fill densityBuffer
+				//m_fillDensityBufferShader.SetFloats("_DensityMap", densityMap);
+				//m_fillDensityBufferShader.Dispatch(0, m_x_dimension / 2, m_y_dimension / 2, m_z_dimension / 2);
+				m_densityBuffer.SetData(densityMap);
+
+				//float[] DM = new float[m_x_dimension * m_y_dimension * m_z_dimension];
+				//m_densityBuffer.GetData(DM);
+
+				/*Vertex[] receivedData = new Vertex[m_maxVertices];
+				List<Vector3> vertices = new List<Vector3>();
+				List<int> triangles = new List<int>();
+				Mesh mesh = new Mesh();
+				m_meshBuffer.GetData(receivedData);
+				for(int i = 0; i < receivedData.Length && receivedData[i].position.w != -1.0f; i++)
+				{
+					vertices.Add(new Vector3(receivedData[i].position.x, receivedData[i].position.y, receivedData[i].position.z));
+					triangles.Add(i);
+				}*/
+
+				//m_marchingCubesShader.SetFloat("_DensityOffset", m_offset);
+				//m_marchingCubesShader.SetBuffer(0, "_Vertices", m_meshBuffer);
+				//m_marchingCubesShader.SetBuffer(0, "_DensityMap", m_densityBuffer);
 				//m_marchingCubesShader.Dispatch(0, m_x_dimension / 8, m_y_dimension / 8, m_z_dimension / 8); //start the magic
 				
 				//receive the verts
