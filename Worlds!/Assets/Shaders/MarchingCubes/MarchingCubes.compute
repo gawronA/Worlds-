@@ -6,7 +6,7 @@ struct Vertex
     float3 normal;
 };
 
-float _Size;
+float _Scale;
 
 uint _DensityMap_sizex, _DensityMap_sizey, _DensityMap_sizez;
 float _DensityOffset;
@@ -74,7 +74,7 @@ void CSMain(uint3 id : SV_DispatchThreadID)
     
 	int i;
     float cube[8];
-    float3 position = float3(id) / _Size;
+    float3 position = float3(id);
     float3 edgeVertex[12];
 
 //fill the cube with density at corners
@@ -99,7 +99,7 @@ void CSMain(uint3 id : SV_DispatchThreadID)
         if(edgesFlags & (1 << i))
         {
             float offset = CalculateOffset(cube[_EdgeConnections[i].x], cube[_EdgeConnections[i].y]);
-            edgeVertex[i] = position + (_VertexOffsets[_EdgeConnections[i].x] + (offset * _EdgeDirections[i]) * _Size);
+            edgeVertex[i] = (position + (_VertexOffsets[_EdgeConnections[i].x] + (offset * _EdgeDirections[i])))*_Scale;
         }
     }
 

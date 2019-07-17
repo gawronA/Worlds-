@@ -21,22 +21,29 @@ public class WorldGenerator : MonoBehaviour
 	{
 		mc = new MarchingCubes();
 		mc.m_marchingCubesShader = m_MarchingCubesShader;
-		mc.m_clearBufferShader = m_FillBufferShader;
-		mc.m_fillDensityBufferShader = m_FillDensityMapShader;
+		mc.m_clearVerticesShader = m_FillBufferShader;
+		//mc.m_fillDensityBufferShader = m_FillDensityMapShader;
 		mc.Initalize(m_x_dim, m_y_dim, m_z_dim, m_size);
-		//mc.m_marchingCubesShader = m_MarchingCubesShader;
-		//m_densityMap = new float[m_x_dim * m_y_dim * m_z_dim];
 		m_densityMap = new float[m_x_dim * m_y_dim * m_z_dim];
-		for(int i = 0; i < m_densityMap.Length; i++)
-		{
-			m_densityMap[i] = Random.value;
-		}
+		
 	}
 	
 	void Update ()
 	{
-		//mc.Initalize(m_x_dim, m_y_dim, m_z_dim, m_size);
-		mc.ComputeMesh(m_densityMap);
-		//Mesh mesh = mc.ComputeMesh(m_densityMap);
+		if(Input.GetButton("Jump"))
+		{
+			for(int i = 0; i < m_densityMap.Length; i++)
+			{
+				m_densityMap[i] = Random.value * 2 - 1;
+			}
+			Mesh mesh = mc.ComputeMesh(m_densityMap);
+			GetComponent<MeshFilter>().mesh = mesh;
+			GetComponent<MeshCollider>().sharedMesh = mesh;
+		}
+	}
+
+	private void OnDestroy()
+	{
+		mc.Release();
 	}
 }

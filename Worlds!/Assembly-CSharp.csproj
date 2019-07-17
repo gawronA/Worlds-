@@ -82,7 +82,6 @@
     <Compile Include="Assets\Scripts\World\VoxelGrid.cs" />
     <Compile Include="Assets\Scripts\World\VoxelMap.cs" />
     <Compile Include="Assets\Scripts\World\WorldGenerator.cs" />
-    <None Include="Assets\Shaders\MarchingCubes\FillDensityMapShader.compute" />
     <None Include="Assets\Shaders\MarchingCubes\Normals.compute" />
     <None Include="Assets\Shaders\MarchingCubes\ClearVerticesShader.compute" />
     <None Include="Assets\Shaders\MarchingCubes\MarchingCubes.compute" />

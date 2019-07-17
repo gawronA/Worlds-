@@ -11,11 +11,12 @@ uint _x, _y, _z;
 
 RWStructuredBuffer<Vertex> _Vertices;
 
-[numthreads(2,2,2)]
+[numthreads(8, 8, 8)]
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
-    if(id.x >= _x - 1 || id.y >= _y - 1 || id.z >= _z - 1) return;
-    int index = id.x + id.y * (_x - 1) + id.z * (_x - 1) * (_y - 1);
+   // if(id.x >= _x - 1 || id.y >= _y - 1 || id.z >= _z - 1) return;
+   // int index = id.x + id.y * (_x - 1) + id.z * (_x - 1) * (_y - 1);
+    int index = id.x + id.y * _x + id.z * _x * _y;
     for(int i = 0; i < 3 * 5; i++)
     {
         Vertex vertex;
