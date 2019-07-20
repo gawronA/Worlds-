@@ -11,39 +11,64 @@ public class WorldGenerator : MonoBehaviour
 	public float m_size = 1.0f;
 	public ComputeShader m_MarchingCubesShader;
 	public ComputeShader m_FillBufferShader;
-	public ComputeShader m_FillDensityMapShader;
+	public ComputeShader m_calculateNormalsShader;
 
 	float[] m_densityMap;
 
 	MarchingCubes mc;
 
+	Mesh mesh;
+
 	void Start ()
 	{
+		mesh = new Mesh();
 		mc = new MarchingCubes();
 		mc.m_marchingCubesShader = m_MarchingCubesShader;
 		mc.m_clearVerticesShader = m_FillBufferShader;
-		//mc.m_fillDensityBufferShader = m_FillDensityMapShader;
+		mc.m_calculateNormalsShader = m_calculateNormalsShader;
 		mc.Initalize(m_x_dim, m_y_dim, m_z_dim, m_size);
 		m_densityMap = new float[m_x_dim * m_y_dim * m_z_dim];
-		
+
+		float radius = 6.0f;
+		Vector3 center = new Vector3(m_x_dim / 2, m_y_dim / 2, m_z_dim / 2);
+		for(int z = 0; z < m_z_dim; z++)
+		{
+			for(int y = 0; y < m_y_dim; y++)
+			{
+				for(int x = 0; x < m_x_dim; x++)
+				{
+					Vector3 point = center - new Vector3(x, y, z);
+					m_densityMap[x + y * m_x_dim + z * m_x_dim * m_y_dim] = Mathf.Clamp((-1.0f / radius) * point.magnitude + 1, -1.0f, 1.0f);
+				}
+			}
+		}
 	}
 	
 	void Update ()
 	{
 		if(Input.GetButton("Jump"))
 		{
-			for(int i = 0; i < m_densityMap.Length; i++)
+			/*for(int i = 0; i < m_densityMap.Length; i++)
 			{
 				m_densityMap[i] = Random.value * 2 - 1;
-			}
-			Mesh mesh = mc.ComputeMesh(m_densityMap);
-			GetComponent<MeshFilter>().mesh = mesh;
+			}*/
+			mesh = mc.ComputeMesh(m_densityMap);
+			//GetComponent<MeshFilter>().mesh = mesh;
 			GetComponent<MeshCollider>().sharedMesh = mesh;
+			//DrawNormals(mesh);
 		}
 	}
 
 	private void OnDestroy()
 	{
 		mc.Release();
+	}
+
+	void DrawNormals(Mesh mesh)
+	{
+		for(int i = 0; i < mesh.vertexCount; i++)
+		{
+			Debug.DrawLine(mesh.vertices[i], mesh.vertices[i] + mesh.normals[i], Color.green, 120.0f);
+		}
 	}
 }

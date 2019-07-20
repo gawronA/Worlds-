@@ -1,18 +1,41 @@
 Base path: D:/Unity/Editor/Data
 Cmd: initializeCompiler
 Cmd: initializeCompiler
+Cmd: preprocessCompute
+  insize=4796 outsize=4795 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=4795 outsize=7617 ok=1
 Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: preprocessCompute
+  insize=4796 outsize=4795 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=4795 outsize=7617 ok=1
+Cmd: preprocessCompute
+  insize=1122 outsize=1121 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=1121 outsize=1081 ok=1
 Cmd: preprocessCompute
   insize=731 outsize=730 ok=1
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: preprocessCompute
+  insize=643 outsize=642 ok=1
 Cmd: compileComputeKernel
-  api=4 insize=730 outsize=729 ok=1
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
+  api=4 insize=642 outsize=1081 ok=1
 Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: initializeCompiler
@@ -22,29 +45,20 @@ Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: preprocessCompute
-  insize=4428 outsize=4427 ok=1
+  insize=858 outsize=857 ok=1
 Cmd: compileComputeKernel
-  api=4 insize=4427 outsize=7001 ok=1
+  api=4 insize=857 outsize=1285 ok=1
 Cmd: initializeCompiler
 Cmd: preprocessCompute
-  insize=4432 outsize=4431 ok=1
+  insize=858 outsize=857 ok=1
+Cmd: initializeCompiler
+Cmd: preprocessCompute
+  insize=861 outsize=860 ok=1
 Cmd: compileComputeKernel
-  api=4 insize=4431 outsize=6977 ok=1
-Cmd: initializeCompiler
-Cmd: preprocessCompute
-  insize=4428 outsize=4427 ok=1
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: preprocessCompute
-  insize=4444 outsize=4443 ok=1
-Cmd: compileComputeKernel
-  api=4 insize=4443 outsize=7317 ok=1
+  api=4 insize=860 outsize=1225 ok=1
 Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: preprocessCompute
-  insize=4422 outsize=4421 ok=1
 Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: initializeCompiler

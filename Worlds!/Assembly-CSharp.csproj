@@ -69,6 +69,7 @@
     <Compile Include="Assets\Scripts\MarchingCubes\MarchingCubesTables.cs" />
     <Compile Include="Assets\Scripts\Obsolate\ArrayHelper.cs" />
     <Compile Include="Assets\Scripts\Obsolate\PlanetBaseGenerator.cs" />
+    <Compile Include="Assets\Scripts\Others\FPSmeter.cs" />
     <Compile Include="Assets\Scripts\Others\Noise.cs" />
     <Compile Include="Assets\Scripts\Others\NoiseTextureCreator.cs" />
     <Compile Include="Assets\Scripts\Others\RigidBodyManipulator.cs" />
@@ -84,6 +85,7 @@
     <Compile Include="Assets\Scripts\World\WorldGenerator.cs" />
     <None Include="Assets\Shaders\MarchingCubes\Normals.compute" />
     <None Include="Assets\Shaders\MarchingCubes\ClearVerticesShader.compute" />
+    <None Include="Assets\Shaders\MarchingCubes\CalculateNormalsShader.compute" />
     <None Include="Assets\Shaders\MarchingCubes\MarchingCubes.compute" />
     <Reference Include="UnityEditor.StandardEvents">
       <HintPath>D:/Unity/Projects/Worlds!/Worlds!/Library/ScriptAssemblies/UnityEditor.StandardEvents.dll</HintPath>

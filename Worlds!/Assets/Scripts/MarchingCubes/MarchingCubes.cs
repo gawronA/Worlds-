@@ -24,6 +24,8 @@ namespace ProceduralTerrain
 			ComputeBuffer m_cubeEdgeFlags, m_traingleConnectionTable;
 			ComputeBuffer m_meshBuffer, m_densityBuffer;
 
+			public RenderTexture m_normalsTexture;
+
 			#pragma warning disable 0649
 			struct Vertex
 			{
@@ -45,7 +47,7 @@ namespace ProceduralTerrain
 				if(m_x_dimension % 8 != 0 || m_y_dimension % 8 != 0 || m_z_dimension % 8 != 0) throw new System.ArgumentException("x, y or z must be divisible by 8");
 				if(m_marchingCubesShader == null) throw new System.ArgumentException("Missing MarchingCubesShader");
 				if(m_clearVerticesShader == null) throw new System.ArgumentException("Missing ClearVerticesShader");
-				//if(m_calculateNormalsShader == null) throw new System.ArgumentException("Missing CalculateNormalsShader");
+				if(m_calculateNormalsShader == null) throw new System.ArgumentException("Missing CalculateNormalsShader");
 
 				//max verts
 				m_maxVertices = m_x_dimension * m_y_dimension * m_z_dimension * 5 * 3;
@@ -60,6 +62,14 @@ namespace ProceduralTerrain
 				//output mesh. 
 				m_meshBuffer = new ComputeBuffer(m_maxVertices, sizeof(float) * 7);
 				m_densityBuffer = new ComputeBuffer(m_x_dimension * m_y_dimension * m_z_dimension, sizeof(float));
+
+				//normals
+				m_normalsTexture = new RenderTexture(m_x_dimension, m_y_dimension, 0, RenderTextureFormat.ARGBHalf, RenderTextureReadWrite.Linear);
+				m_normalsTexture.dimension = UnityEngine.Rendering.TextureDimension.Tex3D;
+				m_normalsTexture.volumeDepth = m_z_dimension;
+				m_normalsTexture.enableRandomWrite = true;
+				m_normalsTexture.useMipMap = false;
+				m_normalsTexture.Create();
 
 				//initalize variables in shader
 				m_marchingCubesShader.SetInt("_DensityMap_sizex", m_x_dimension);
@@ -78,19 +88,26 @@ namespace ProceduralTerrain
 				m_clearVerticesShader.SetBuffer(0, "_Vertices", m_meshBuffer);
 
 				//CalculateNormals
+				m_calculateNormalsShader.SetInt("_x", m_x_dimension);
+				m_calculateNormalsShader.SetInt("_y", m_y_dimension);
+				m_calculateNormalsShader.SetInt("_z", m_z_dimension);
+				m_calculateNormalsShader.SetTexture(0, "_Normals", m_normalsTexture);
 			}
 
 			public Mesh ComputeMesh(float[] densityMap)
 			{
+				m_densityBuffer.SetData(densityMap);
 				//Clear vertices
 				m_clearVerticesShader.Dispatch(0, m_x_dimension / 8, m_y_dimension / 8, m_z_dimension / 8);
 
 				//Calculate normals
-
+				m_calculateNormalsShader.SetBuffer(0, "_DensityMap", m_densityBuffer);
+				m_calculateNormalsShader.SetTexture(0, "_Normals", m_normalsTexture);
+				m_calculateNormalsShader.Dispatch(0, m_x_dimension / 8, m_y_dimension / 8, m_z_dimension / 8);
 				
 				//Initalize MC
-				m_densityBuffer.SetData(densityMap);
 				m_marchingCubesShader.SetFloat("_DensityOffset", m_offset);
+				m_marchingCubesShader.SetTexture(0, "_Normals", m_normalsTexture);
 				m_marchingCubesShader.SetBuffer(0, "_Vertices", m_meshBuffer);
 				m_marchingCubesShader.SetBuffer(0, "_DensityMap", m_densityBuffer);
 				m_marchingCubesShader.Dispatch(0, m_x_dimension / 8, m_y_dimension / 8, m_z_dimension / 8); //start the magic
@@ -98,6 +115,7 @@ namespace ProceduralTerrain
 				//receive the verts
 				Vertex[] receivedData = new Vertex[m_maxVertices];
 				List<Vector3> vertices = new List<Vector3>();
+				List<Vector3> normals = new List<Vector3>();
 				List<int> triangles = new List<int>();
 				Mesh mesh = new Mesh();
 
@@ -107,13 +125,15 @@ namespace ProceduralTerrain
 					if(receivedData[i].position.w != -1.0f)
 					{
 						vertices.Add(new Vector3(receivedData[i].position.x, receivedData[i].position.y, receivedData[i].position.z));
+						normals.Add(new Vector3(receivedData[i].normal.x, receivedData[i].normal.y, receivedData[i].normal.z));
 						triangles.Add(idx++);
 					}
 				}
 
 				mesh.SetVertices(vertices);
+				mesh.SetNormals(normals);
 				mesh.SetTriangles(triangles, 0);
-				mesh.RecalculateNormals();
+				//mesh.RecalculateNormals();
 				
 				return mesh;
 			}
@@ -125,6 +145,19 @@ namespace ProceduralTerrain
 				m_meshBuffer.Release();
 				m_densityBuffer.Release();
 			}
+
+			/*public Vector3[] CalculateNormals(float[] densityMap)
+			{
+				m_calculateNormalsShader.SetInt("_x", m_x_dimension);
+				m_calculateNormalsShader.SetInt("_y", m_y_dimension);
+				m_calculateNormalsShader.SetInt("_z", m_z_dimension);
+				m_calculateNormalsShader.SetBuffer(0, "_DensityMap", m_densityBuffer);
+				m_calculateNormalsShader.SetBuffer(0, "_Normals", normalsBuffer);
+				m_calculateNormalsShader.Dispatch(0, m_x_dimension / 2, m_y_dimension / 2, m_z_dimension / 2);
+				Vector3[] normals = new Vector3[m_x_dimension * m_y_dimension * m_z_dimension];
+				normalsBuffer.GetData(normals);
+				return normals;
+			}*/
 		}
 	}
 }
