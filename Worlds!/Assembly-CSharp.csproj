@@ -74,6 +74,12 @@
     <Compile Include="Assets\Scripts\Others\NoiseTextureCreator.cs" />
     <Compile Include="Assets\Scripts\Others\RigidBodyManipulator.cs" />
     <Compile Include="Assets\Scripts\Others\SurfaceTextureCreator.cs" />
+    <Compile Include="Assets\Scripts\ShaderTutorial\Part 1 Matrices\CameraTransformation.cs" />
+    <Compile Include="Assets\Scripts\ShaderTutorial\Part 1 Matrices\PositionTransformation.cs" />
+    <Compile Include="Assets\Scripts\ShaderTutorial\Part 1 Matrices\RotationTransformation.cs" />
+    <Compile Include="Assets\Scripts\ShaderTutorial\Part 1 Matrices\ScaleTransformation.cs" />
+    <Compile Include="Assets\Scripts\ShaderTutorial\Part 1 Matrices\Transformation.cs" />
+    <Compile Include="Assets\Scripts\ShaderTutorial\Part 1 Matrices\TransformationGrid.cs" />
     <Compile Include="Assets\Scripts\World\DrawBiome.cs" />
     <Compile Include="Assets\Scripts\World\DrawSurface.cs" />
     <Compile Include="Assets\Scripts\World\Isolevel.cs" />
@@ -85,7 +91,10 @@
     <Compile Include="Assets\Scripts\World\WorldGenerator.cs" />
     <None Include="Assets\Shaders\MarchingCubes\Normals.compute" />
     <None Include="Assets\Shaders\MarchingCubes\ClearVerticesShader.compute" />
+    <None Include="Assets\Scripts\ShaderTutorial\Part 2 First Shader\Textured With Detail.shader" />
     <None Include="Assets\Shaders\MarchingCubes\CalculateNormalsShader.compute" />
+    <None Include="Assets\Scripts\ShaderTutorial\Part 2 First Shader\My First Shader.shader" />
+    <None Include="Assets\Scripts\ShaderTutorial\Part 2 First Shader\Texture Splatting.shader" />
     <None Include="Assets\Shaders\MarchingCubes\MarchingCubes.compute" />
     <Reference Include="UnityEditor.StandardEvents">
       <HintPath>D:/Unity/Projects/Worlds!/Worlds!/Library/ScriptAssemblies/UnityEditor.StandardEvents.dll</HintPath>

@@ -29,7 +29,7 @@ public class WorldGenerator : MonoBehaviour
 		mc.Initalize(m_x_dim, m_y_dim, m_z_dim, m_size);
 		m_densityMap = new float[m_x_dim * m_y_dim * m_z_dim];
 
-		float radius = 6.0f;
+		float radius = 7.0f;
 		Vector3 center = new Vector3(m_x_dim / 2, m_y_dim / 2, m_z_dim / 2);
 		for(int z = 0; z < m_z_dim; z++)
 		{
@@ -53,7 +53,7 @@ public class WorldGenerator : MonoBehaviour
 				m_densityMap[i] = Random.value * 2 - 1;
 			}*/
 			mesh = mc.ComputeMesh(m_densityMap);
-			//GetComponent<MeshFilter>().mesh = mesh;
+			GetComponent<MeshFilter>().mesh = mesh;
 			GetComponent<MeshCollider>().sharedMesh = mesh;
 			//DrawNormals(mesh);
 		}

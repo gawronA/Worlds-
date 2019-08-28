@@ -36,18 +36,23 @@ namespace ProceduralTerrain
 			};
 			#pragma warning restore 0649
 
-			public void Initalize(int x_dim, int y_dim, int z_dim, float size)
+			public void Initalize(int x_dim, int y_dim, int z_dim, float size, int lod)
 			{
-				m_x_dimension = x_dim;
-				m_y_dimension = y_dim;
-				m_z_dimension = z_dim;
-				m_scale = size;
-				
 				//each dimension must be divisable by 8, densitymap and MC shader must be present
-				if(m_x_dimension % 8 != 0 || m_y_dimension % 8 != 0 || m_z_dimension % 8 != 0) throw new System.ArgumentException("x, y or z must be divisible by 8");
+				if(x_dim % 8 != 0 || y_dim % 8 != 0 || z_dim % 8 != 0) throw new System.ArgumentException("x, y or z must be divisible by 8");
+				if(lod < 0 || lod > 3) throw new System.ArgumentException("lewel-of-detail must be in range 0 to 3");
 				if(m_marchingCubesShader == null) throw new System.ArgumentException("Missing MarchingCubesShader");
 				if(m_clearVerticesShader == null) throw new System.ArgumentException("Missing ClearVerticesShader");
 				if(m_calculateNormalsShader == null) throw new System.ArgumentException("Missing CalculateNormalsShader");
+
+
+				lod = (int)Mathf.Pow(2, lod);
+				m_x_dimension = x_dim / lod;
+				m_y_dimension = y_dim / lod;
+				m_z_dimension = z_dim / lod;
+				m_scale = size;
+				
+				
 
 				//max verts
 				m_maxVertices = m_x_dimension * m_y_dimension * m_z_dimension * 5 * 3;
@@ -75,6 +80,7 @@ namespace ProceduralTerrain
 				m_marchingCubesShader.SetInt("_DensityMap_sizex", m_x_dimension);
 				m_marchingCubesShader.SetInt("_DensityMap_sizey", m_y_dimension);
 				m_marchingCubesShader.SetInt("_DensityMap_sizez", m_z_dimension);
+				m_marchingCubesShader.SetInt("_Lod", lod);
 				m_marchingCubesShader.SetFloat("_DensityOffset", m_offset);
 				m_marchingCubesShader.SetFloat("_Scale", m_scale);
 				m_marchingCubesShader.SetBuffer(0, "_CubeEdgeFlags", m_cubeEdgeFlags);

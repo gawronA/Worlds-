@@ -1,64 +1,15 @@
 Base path: D:/Unity/Editor/Data
 Cmd: initializeCompiler
 Cmd: initializeCompiler
-Cmd: preprocessCompute
-  insize=4796 outsize=4795 ok=1
-Cmd: compileComputeKernel
-  api=4 insize=4795 outsize=7617 ok=1
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: preprocessCompute
-  insize=4796 outsize=4795 ok=1
-Cmd: compileComputeKernel
-  api=4 insize=4795 outsize=7617 ok=1
-Cmd: preprocessCompute
-  insize=1122 outsize=1121 ok=1
-Cmd: compileComputeKernel
-  api=4 insize=1121 outsize=1081 ok=1
-Cmd: preprocessCompute
-  insize=731 outsize=730 ok=1
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
+  insize=5093 outsize=5092 ok=1
 Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: preprocessCompute
-  insize=643 outsize=642 ok=1
-Cmd: compileComputeKernel
-  api=4 insize=642 outsize=1081 ok=1
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: preprocessCompute
-  insize=858 outsize=857 ok=1
-Cmd: compileComputeKernel
-  api=4 insize=857 outsize=1285 ok=1
-Cmd: initializeCompiler
-Cmd: preprocessCompute
-  insize=858 outsize=857 ok=1
-Cmd: initializeCompiler
-Cmd: preprocessCompute
-  insize=861 outsize=860 ok=1
-Cmd: compileComputeKernel
-  api=4 insize=860 outsize=1225 ok=1
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
+  insize=5093 outsize=5092 ok=1
 Cmd: initializeCompiler
 Cmd: initializeCompiler
