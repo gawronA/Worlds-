@@ -24,6 +24,8 @@ namespace ProceduralTerrain
 			ComputeBuffer m_cubeEdgeFlags, m_traingleConnectionTable;
 			ComputeBuffer m_meshBuffer, m_densityBuffer;
 
+			ComputeBuffer m_debugBuffer;
+
 			public RenderTexture m_normalsTexture;
 
 			#pragma warning disable 0649
@@ -39,7 +41,7 @@ namespace ProceduralTerrain
 			public void Initalize(int x_dim, int y_dim, int z_dim, float size, int lod)
 			{
 				//each dimension must be divisable by 8, densitymap and MC shader must be present
-				if(x_dim % 8 != 0 || y_dim % 8 != 0 || z_dim % 8 != 0) throw new System.ArgumentException("x, y or z must be divisible by 8");
+				//if(x_dim % 8 != 0 || y_dim % 8 != 0 || z_dim % 8 != 0) throw new System.ArgumentException("x, y or z must be divisible by 8");
 				if(lod < 0 || lod > 3) throw new System.ArgumentException("lewel-of-detail must be in range 0 to 3");
 				if(m_marchingCubesShader == null) throw new System.ArgumentException("Missing MarchingCubesShader");
 				if(m_clearVerticesShader == null) throw new System.ArgumentException("Missing ClearVerticesShader");
@@ -64,9 +66,11 @@ namespace ProceduralTerrain
 				m_traingleConnectionTable = new ComputeBuffer(256 * 16, sizeof(int));
 				m_traingleConnectionTable.SetData(MarchingCubesTables.TriangleConnectionTable);
 
+				m_debugBuffer = new ComputeBuffer(8, sizeof(float));
+
 				//output mesh. 
 				m_meshBuffer = new ComputeBuffer(m_maxVertices, sizeof(float) * 7);
-				m_densityBuffer = new ComputeBuffer(m_x_dimension * m_y_dimension * m_z_dimension, sizeof(float));
+				m_densityBuffer = new ComputeBuffer(x_dim * y_dim * z_dim, sizeof(float));
 
 				//normals
 				m_normalsTexture = new RenderTexture(m_x_dimension, m_y_dimension, 0, RenderTextureFormat.ARGBHalf, RenderTextureReadWrite.Linear);
@@ -77,14 +81,15 @@ namespace ProceduralTerrain
 				m_normalsTexture.Create();
 
 				//initalize variables in shader
-				m_marchingCubesShader.SetInt("_DensityMap_sizex", m_x_dimension);
-				m_marchingCubesShader.SetInt("_DensityMap_sizey", m_y_dimension);
-				m_marchingCubesShader.SetInt("_DensityMap_sizez", m_z_dimension);
+				m_marchingCubesShader.SetInt("_DensityMap_sizex", x_dim);
+				m_marchingCubesShader.SetInt("_DensityMap_sizey", y_dim);
+				m_marchingCubesShader.SetInt("_DensityMap_sizez", z_dim);
 				m_marchingCubesShader.SetInt("_Lod", lod);
 				m_marchingCubesShader.SetFloat("_DensityOffset", m_offset);
 				m_marchingCubesShader.SetFloat("_Scale", m_scale);
 				m_marchingCubesShader.SetBuffer(0, "_CubeEdgeFlags", m_cubeEdgeFlags);
 				m_marchingCubesShader.SetBuffer(0, "_TriangleConnectionTable", m_traingleConnectionTable);
+				m_marchingCubesShader.SetBuffer(0, "_Debug", m_debugBuffer);
 
 				//ClearVertices
 				//Filling with -1 to all the vertices have.w direction -1(which means that it has not been modified)
@@ -97,6 +102,7 @@ namespace ProceduralTerrain
 				m_calculateNormalsShader.SetInt("_x", m_x_dimension);
 				m_calculateNormalsShader.SetInt("_y", m_y_dimension);
 				m_calculateNormalsShader.SetInt("_z", m_z_dimension);
+				m_calculateNormalsShader.SetInt("_Lod", lod);
 				m_calculateNormalsShader.SetTexture(0, "_Normals", m_normalsTexture);
 			}
 
@@ -104,20 +110,23 @@ namespace ProceduralTerrain
 			{
 				m_densityBuffer.SetData(densityMap);
 				//Clear vertices
-				m_clearVerticesShader.Dispatch(0, m_x_dimension / 8, m_y_dimension / 8, m_z_dimension / 8);
+				//m_clearVerticesShader.Dispatch(0, m_x_dimension / 8, m_y_dimension / 8, m_z_dimension / 8);
+				m_clearVerticesShader.Dispatch(0, m_x_dimension, m_y_dimension, m_z_dimension);
 
 				//Calculate normals
 				m_calculateNormalsShader.SetBuffer(0, "_DensityMap", m_densityBuffer);
 				m_calculateNormalsShader.SetTexture(0, "_Normals", m_normalsTexture);
-				m_calculateNormalsShader.Dispatch(0, m_x_dimension / 8, m_y_dimension / 8, m_z_dimension / 8);
-				
+				//m_calculateNormalsShader.Dispatch(0, m_x_dimension / 8, m_y_dimension / 8, m_z_dimension / 8);
+				m_calculateNormalsShader.Dispatch(0, m_x_dimension, m_y_dimension, m_z_dimension);
+
 				//Initalize MC
 				m_marchingCubesShader.SetFloat("_DensityOffset", m_offset);
 				m_marchingCubesShader.SetTexture(0, "_Normals", m_normalsTexture);
 				m_marchingCubesShader.SetBuffer(0, "_Vertices", m_meshBuffer);
 				m_marchingCubesShader.SetBuffer(0, "_DensityMap", m_densityBuffer);
-				m_marchingCubesShader.Dispatch(0, m_x_dimension / 8, m_y_dimension / 8, m_z_dimension / 8); //start the magic
-				
+				//m_marchingCubesShader.Dispatch(0, m_x_dimension / 8, m_y_dimension / 8, m_z_dimension / 8); //start the magic
+				m_marchingCubesShader.Dispatch(0, m_x_dimension, m_y_dimension, m_z_dimension);
+
 				//receive the verts
 				Vertex[] receivedData = new Vertex[m_maxVertices];
 				List<Vector3> vertices = new List<Vector3>();
@@ -140,7 +149,10 @@ namespace ProceduralTerrain
 				mesh.SetNormals(normals);
 				mesh.SetTriangles(triangles, 0);
 				//mesh.RecalculateNormals();
-				
+
+				float[] receivedDebug = new float[8];
+				m_debugBuffer.GetData(receivedDebug);
+
 				return mesh;
 			}
 

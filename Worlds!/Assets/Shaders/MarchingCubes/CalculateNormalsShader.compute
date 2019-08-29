@@ -1,17 +1,17 @@
 ﻿// Each #kernel tells which function to compile; you can have many kernels
 #pragma kernel CSMain
 
-uint _x, _y, _z;
+uint _x, _y, _z, _Lod;
 
 StructuredBuffer<float> _DensityMap;
 
 RWTexture3D<float3> _Normals;
 
-[numthreads(8, 8, 8)]
+[numthreads(1, 1, 1)]
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
 
-    int idx = id.x + id.y * _x + id.z * _x * _y;
+    int idx = id.x * _Lod + id.y * _Lod * _x + id.z * _Lod * _x * _y;
 	float dx, dy, dz;
     float value = _DensityMap[idx];
 	float deltax, deltay, deltaz;

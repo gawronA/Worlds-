@@ -9,7 +9,7 @@ struct Vertex
 SamplerState _LinearClamp;
 
 float _Scale;
-int _Lod;
+uint _Lod;
 
 uint _DensityMap_sizex, _DensityMap_sizey, _DensityMap_sizez;
 float _DensityOffset;
@@ -19,6 +19,7 @@ StructuredBuffer<int> _CubeEdgeFlags;
 StructuredBuffer<float> _DensityMap;
 Texture3D<float3> _Normals;
 RWStructuredBuffer<Vertex> _Vertices;
+RWStructuredBuffer<float> _Debug;
 
 static int2 _EdgeConnections[12] =
 {
@@ -43,15 +44,15 @@ static float3 _VertexOffsets[8] =
 void FillCell(int x, int y, int z, out float cell[8])
 {
     int _DensityMap_sziexy = _DensityMap_sizex * _DensityMap_sizey;
-    cell[0] = _DensityMap[x + y * _DensityMap_sizex + z * _DensityMap_sziexy];
-    cell[1] = _DensityMap[(x + 1) + y * _DensityMap_sizex + z * _DensityMap_sziexy];
-    cell[2] = _DensityMap[(x + 1) + (y + 1) * _DensityMap_sizex + z * _DensityMap_sziexy];
-    cell[3] = _DensityMap[x + (y + 1) * _DensityMap_sizex + z * _DensityMap_sziexy];
-    cell[4] = _DensityMap[x + y * _DensityMap_sizex + (z + 1) * _DensityMap_sziexy];
+    cell[0] = _DensityMap[x * _Lod + y * _Lod * _DensityMap_sizex + z * _Lod * _DensityMap_sziexy];
+    cell[1] = _DensityMap[(x + 1) * _Lod + y * _Lod * _DensityMap_sizex + z * _Lod * _DensityMap_sziexy];
+    cell[2] = _DensityMap[((x + 1) * _Lod) + ((y + 1) * _Lod * _DensityMap_sizex) + (z * _Lod * _DensityMap_sziexy)];
+    cell[3] = _DensityMap[x * _Lod + (y + 1) * _Lod * _DensityMap_sizex + z * _Lod * _DensityMap_sziexy];
     
-	cell[5] = _DensityMap[(x + 1) + y * _DensityMap_sizex + (z + 1) * _DensityMap_sziexy];
-    cell[6] = _DensityMap[(x + 1) + (y + 1) * _DensityMap_sizex + (z + 1) * _DensityMap_sziexy];
-    cell[7] = _DensityMap[x + (y + 1) * _DensityMap_sizex + (z + 1) * _DensityMap_sziexy];
+	cell[4] = _DensityMap[x * _Lod + y * _Lod * _DensityMap_sizex + (z + 1) * _Lod * _DensityMap_sziexy];
+	cell[5] = _DensityMap[(x + 1) * _Lod + y * _Lod * _DensityMap_sizex + (z + 1) * _Lod * _DensityMap_sziexy];
+    cell[6] = _DensityMap[(x + 1) * _Lod + (y + 1) * _Lod * _DensityMap_sizex + (z + 1) * _Lod * _DensityMap_sziexy];
+    cell[7] = _DensityMap[x * _Lod + (y + 1) * _Lod * _DensityMap_sizex + (z + 1) * _Lod * _DensityMap_sziexy];
 }
 
 float CalculateOffset(float v1, float v2)
@@ -72,24 +73,10 @@ Vertex CreateVertex(float3 position, float3 normalsTextureSize)
     return vert;
 }
 
-[numthreads(8, 8, 8)]
+[numthreads(1, 1, 1)]
 void CSMain(uint3 id : SV_DispatchThreadID)
 {
-	switch(_Lod)
-	{
-		case 1:
-			if(id.x % 2 != 0 || id.y % 2 != 0 || id.z % 2 != 0) return;
-		break;
-		
-		case 2:
-			if(id.x % 4 != 0 || id.y % 4 != 0 || id.z % 4 != 0) return;
-		break;
-		
-		case 3:
-			if(id.x % 8 != 0 || id.y % 8 != 0 || id.z % 8 != 0) return;
-		break;
-	}
-    if(id.x >= _DensityMap_sizex - 1 || id.y >= _DensityMap_sizey - 1 || id.z >= _DensityMap_sizez - 1)
+    if((id.x >= _DensityMap_sizex / _Lod - 1) || (id.y >= _DensityMap_sizey / _Lod - 1) || (id.z >= _DensityMap_sizez / _Lod - 1))
         return;
     
 	int i;
@@ -99,7 +86,7 @@ void CSMain(uint3 id : SV_DispatchThreadID)
 
 //fill the cube with density at corners
     FillCell(id.x, id.y, id.z, cube);
-
+														for(i=0;i<8;i++) _Debug[i] = cube[i];
 //find whether corner is inside or outside the surface
     int flagIndex = 0;
     for(i = 0; i < 8; i++)
@@ -119,12 +106,12 @@ void CSMain(uint3 id : SV_DispatchThreadID)
         if(edgesFlags & (1 << i))
         {
             float offset = CalculateOffset(cube[_EdgeConnections[i].x], cube[_EdgeConnections[i].y]);
-            edgeVertex[i] = (position + (_VertexOffsets[_EdgeConnections[i].x] + (offset * _EdgeDirections[i])))*_Scale;
+            edgeVertex[i] = (position + (_VertexOffsets[_EdgeConnections[i].x] + (offset * _EdgeDirections[i]))) * _Scale * _Lod;
         }
     }
 
 //Do the triangulation
-    int buffer_index = id.x + id.y * _DensityMap_sizex + id.z * _DensityMap_sizex * _DensityMap_sizey;
+    int buffer_index = id.x + id.y * (_DensityMap_sizex / _Lod) + id.z * (_DensityMap_sizex / _Lod) * (_DensityMap_sizey / _Lod);
     float3 normalsTextureSize = float3((_DensityMap_sizex - 1), (_DensityMap_sizey - 1), (_DensityMap_sizez - 1));
     for(i = 0; i < 5; i++) //up to 5 triangles
     {
