@@ -20,6 +20,7 @@ namespace ProceduralTerrain
 
 			float[] m_densityMap;
 			int m_maxVertices;
+			int m_lod;
 
 			ComputeBuffer m_cubeEdgeFlags, m_traingleConnectionTable;
 			ComputeBuffer m_meshBuffer, m_densityBuffer;
@@ -49,6 +50,7 @@ namespace ProceduralTerrain
 
 
 				lod = (int)Mathf.Pow(2, lod);
+				m_lod = lod;
 				m_x_dimension = x_dim / lod;
 				m_y_dimension = y_dim / lod;
 				m_z_dimension = z_dim / lod;
@@ -73,13 +75,14 @@ namespace ProceduralTerrain
 				m_densityBuffer = new ComputeBuffer(x_dim * y_dim * z_dim, sizeof(float));
 
 				//normals
-				m_normalsTexture = new RenderTexture(m_x_dimension, m_y_dimension, 0, RenderTextureFormat.ARGBHalf, RenderTextureReadWrite.Linear);
+				m_normalsTexture = new RenderTexture(x_dim, y_dim, 0, RenderTextureFormat.ARGBHalf, RenderTextureReadWrite.Linear);
 				m_normalsTexture.dimension = UnityEngine.Rendering.TextureDimension.Tex3D;
-				m_normalsTexture.volumeDepth = m_z_dimension;
+				m_normalsTexture.volumeDepth = z_dim;
 				m_normalsTexture.enableRandomWrite = true;
 				m_normalsTexture.useMipMap = false;
 				m_normalsTexture.Create();
 
+				
 				//initalize variables in shader
 				m_marchingCubesShader.SetInt("_DensityMap_sizex", x_dim);
 				m_marchingCubesShader.SetInt("_DensityMap_sizey", y_dim);
@@ -99,9 +102,9 @@ namespace ProceduralTerrain
 				m_clearVerticesShader.SetBuffer(0, "_Vertices", m_meshBuffer);
 
 				//CalculateNormals
-				m_calculateNormalsShader.SetInt("_x", m_x_dimension);
-				m_calculateNormalsShader.SetInt("_y", m_y_dimension);
-				m_calculateNormalsShader.SetInt("_z", m_z_dimension);
+				m_calculateNormalsShader.SetInt("_x", x_dim);
+				m_calculateNormalsShader.SetInt("_y", y_dim);
+				m_calculateNormalsShader.SetInt("_z", z_dim);
 				m_calculateNormalsShader.SetInt("_Lod", lod);
 				m_calculateNormalsShader.SetTexture(0, "_Normals", m_normalsTexture);
 			}
@@ -117,7 +120,7 @@ namespace ProceduralTerrain
 				m_calculateNormalsShader.SetBuffer(0, "_DensityMap", m_densityBuffer);
 				m_calculateNormalsShader.SetTexture(0, "_Normals", m_normalsTexture);
 				//m_calculateNormalsShader.Dispatch(0, m_x_dimension / 8, m_y_dimension / 8, m_z_dimension / 8);
-				m_calculateNormalsShader.Dispatch(0, m_x_dimension, m_y_dimension, m_z_dimension);
+				m_calculateNormalsShader.Dispatch(0, m_x_dimension * m_lod, m_y_dimension * m_lod, m_z_dimension * m_lod);
 
 				//Initalize MC
 				m_marchingCubesShader.SetFloat("_DensityOffset", m_offset);
@@ -163,19 +166,7 @@ namespace ProceduralTerrain
 				m_meshBuffer.Release();
 				m_densityBuffer.Release();
 			}
-
-			/*public Vector3[] CalculateNormals(float[] densityMap)
-			{
-				m_calculateNormalsShader.SetInt("_x", m_x_dimension);
-				m_calculateNormalsShader.SetInt("_y", m_y_dimension);
-				m_calculateNormalsShader.SetInt("_z", m_z_dimension);
-				m_calculateNormalsShader.SetBuffer(0, "_DensityMap", m_densityBuffer);
-				m_calculateNormalsShader.SetBuffer(0, "_Normals", normalsBuffer);
-				m_calculateNormalsShader.Dispatch(0, m_x_dimension / 2, m_y_dimension / 2, m_z_dimension / 2);
-				Vector3[] normals = new Vector3[m_x_dimension * m_y_dimension * m_z_dimension];
-				normalsBuffer.GetData(normals);
-				return normals;
-			}*/
+			
 		}
 	}
 }

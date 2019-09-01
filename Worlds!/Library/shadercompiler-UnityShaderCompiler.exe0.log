@@ -1,110 +1,87 @@
 Base path: D:/Unity/Editor/Data
 Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
 Cmd: preprocessCompute
-  insize=5035 outsize=5034 ok=1
-Cmd: preprocessCompute
-  insize=5062 outsize=5061 ok=1
+  insize=951 outsize=950 ok=1
 Cmd: compileComputeKernel
-  api=4 insize=5061 outsize=8241 ok=1
+  api=4 insize=950 outsize=1449 ok=1
 Cmd: initializeCompiler
 Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: preprocessCompute
-  insize=5062 outsize=5061 ok=1
-Cmd: compileComputeKernel
-  api=4 insize=5061 outsize=8241 ok=1
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: preprocessCompute
-  insize=5083 outsize=5082 ok=1
-Cmd: initializeCompiler
-Cmd: preprocessCompute
-  insize=5080 outsize=5079 ok=1
-Cmd: compileComputeKernel
-  api=4 insize=5079 outsize=8389 ok=1
-Cmd: initializeCompiler
-Cmd: preprocessCompute
-  insize=5086 outsize=5085 ok=1
-Cmd: compileComputeKernel
-  api=4 insize=5085 outsize=8389 ok=1
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: preprocessCompute
-  insize=888 outsize=887 ok=1
-Cmd: compileComputeKernel
-  api=4 insize=887 outsize=1469 ok=1
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: preprocessCompute
-  insize=5096 outsize=5095 ok=1
-Cmd: compileComputeKernel
-  api=4 insize=5095 outsize=8117 ok=1
-Cmd: initializeCompiler
-Cmd: preprocessCompute
-  insize=5092 outsize=5091 ok=1
-Cmd: compileComputeKernel
-  api=4 insize=5091 outsize=8389 ok=1
-Cmd: initializeCompiler
-Cmd: preprocessCompute
-  insize=5119 outsize=5118 ok=1
-Cmd: compileComputeKernel
-  api=4 insize=5118 outsize=8381 ok=1
-Cmd: initializeCompiler
-Cmd: preprocessCompute
-  insize=5140 outsize=5139 ok=1
-Cmd: compileComputeKernel
-  api=4 insize=5139 outsize=8321 ok=1
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: preprocessCompute
-  insize=5147 outsize=5146 ok=1
 Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: preprocessCompute
   insize=5149 outsize=5148 ok=1
-Cmd: compileComputeKernel
-  api=4 insize=5148 outsize=8681 ok=1
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: preprocessCompute
-  insize=5128 outsize=5127 ok=1
+  insize=978 outsize=977 ok=1
+Cmd: initializeCompiler
+Cmd: preprocessCompute
+  insize=999 outsize=998 ok=1
 Cmd: compileComputeKernel
-  api=4 insize=5127 outsize=8705 ok=1
+  api=4 insize=998 outsize=1553 ok=1
 Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: initializeCompiler
+Cmd: preprocessCompute
+  insize=415 outsize=414 ok=1
+Cmd: preprocessCompute
+  insize=243 outsize=242 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=242 outsize=545 ok=1
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: preprocessCompute
+  insize=5152 outsize=5151 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=5151 outsize=8321 ok=1
+Cmd: preprocessCompute
+  insize=978 outsize=977 ok=1
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: preprocessCompute
+  insize=1393 outsize=1392 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=1392 outsize=1437 ok=1
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: preprocessCompute
+  insize=1856 outsize=1855 ok=1
+Cmd: preprocessCompute
+  insize=1858 outsize=1857 ok=1
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: preprocessCompute
+  insize=5140 outsize=5139 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=5139 outsize=8489 ok=1
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: preprocessCompute
+  insize=5130 outsize=5129 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=5129 outsize=8705 ok=1
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: preprocessCompute
+  insize=5130 outsize=5129 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=5129 outsize=8417 ok=1
 Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: initializeCompiler

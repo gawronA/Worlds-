@@ -72,6 +72,7 @@
     <Compile Include="Assets\Scripts\Others\FPSmeter.cs" />
     <Compile Include="Assets\Scripts\Others\Noise.cs" />
     <Compile Include="Assets\Scripts\Others\NoiseTextureCreator.cs" />
+    <Compile Include="Assets\Scripts\Others\RenderTextureHelper.cs" />
     <Compile Include="Assets\Scripts\Others\RigidBodyManipulator.cs" />
     <Compile Include="Assets\Scripts\Others\SurfaceTextureCreator.cs" />
     <Compile Include="Assets\Scripts\ShaderTutorial\Part 1 Matrices\CameraTransformation.cs" />
@@ -91,6 +92,7 @@
     <Compile Include="Assets\Scripts\World\WorldGenerator.cs" />
     <None Include="Assets\Shaders\MarchingCubes\Normals.compute" />
     <None Include="Assets\Shaders\MarchingCubes\ClearVerticesShader.compute" />
+    <None Include="Assets\Scripts\Others\slicer.compute" />
     <None Include="Assets\Scripts\ShaderTutorial\Part 2 First Shader\Textured With Detail.shader" />
     <None Include="Assets\Shaders\MarchingCubes\CalculateNormalsShader.compute" />
     <None Include="Assets\Scripts\ShaderTutorial\Part 2 First Shader\My First Shader.shader" />

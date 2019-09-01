@@ -252,9 +252,9 @@ MonoBehaviour:
   m_x_dim: 16
   m_y_dim: 16
   m_z_dim: 16
-  m_size: 1
-  m_radius: 6
-  m_LOD: 2
+  m_size: 5
+  m_radius: 5
+  m_LOD: 1
   m_MarchingCubesShader: {fileID: 7200000, guid: 5accd0df264625845b084ad3587a684b,
     type: 3}
   m_FillBufferShader: {fileID: 7200000, guid: f94777e24265ec34190746726e245745, type: 3}

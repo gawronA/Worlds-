@@ -69,7 +69,7 @@ public class WorldGenerator : MonoBehaviour
 			mesh = mc.ComputeMesh(m_densityMap);
 			GetComponent<MeshFilter>().mesh = mesh;
 			GetComponent<MeshCollider>().sharedMesh = mesh;
-			//DrawNormals(mesh);
+			DrawNormals(mesh);
 		}
 	}
 

@@ -11,7 +11,7 @@ RWTexture3D<float3> _Normals;
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
 
-    int idx = id.x * _Lod + id.y * _Lod * _x + id.z * _Lod * _x * _y;
+    int idx = id.x + id.y * _x + id.z * _x * _y;
 	float dx, dy, dz;
     float value = _DensityMap[idx];
 	float deltax, deltay, deltaz;
@@ -22,10 +22,44 @@ void CSMain (uint3 id : SV_DispatchThreadID)
 	else deltay = _DensityMap[id.x + (id.y + 1) * _x + id.z * _x * _y];
 	if (id.z == _z - 1) deltaz = -1.0f;
 	else deltaz = _DensityMap[id.x + id.y * _x + (id.z + 1) * _x * _y];
-
-	dx = value - deltax;
-	dy = value - deltay;
-	dz = value - deltaz;
+	
+	dx = (value - deltax);
+	dy = (value - deltay);
+	dz = (value - deltaz);
 
 	_Normals[id] = normalize(float3(dx, dy, dz));
 }
+
+/*
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+uint _x, _y, _z, _Lod;
+
+StructuredBuffer<float> _DensityMap;
+
+RWTexture3D<float3> _Normals;
+
+[numthreads(1, 1, 1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+
+    int idx = id.x * _Lod + id.y * _x * _Lod + id.z * _x * _y * _Lod;
+	float dx, dy, dz;
+    float value = _DensityMap[idx];
+	float deltax, deltay, deltaz;
+	
+	if (id.x == _x / _Lod - 1) deltax = -1.0f;
+	else deltax = _DensityMap[(id.x + 1) * _Lod + id.y * _x * _Lod + id.z * _x * _y * _Lod];
+	if (id.y == _y / _Lod - 1) deltay = -1.0f;
+	else deltay = _DensityMap[id.x * _Lod + (id.y + 1) * _x * _Lod + id.z * _x * _y * _Lod];
+	if (id.z == _z / _Lod - 1) deltaz = -1.0f;
+	else deltaz = _DensityMap[id.x * _Lod + id.y * _x * _Lod + (id.z + 1) * _x * _y * _Lod];
+	
+	dx = (value - deltax);
+	dy = (value - deltay);
+	dz = (value - deltaz);
+
+	_Normals[id] = normalize(float3(dx, dy, dz));
+}
+*/
