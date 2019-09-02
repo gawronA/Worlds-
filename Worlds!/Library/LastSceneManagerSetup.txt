@@ -2,6 +2,6 @@ sceneSetups:
 - path: Assets/Scenes/SampleScene.unity
   isLoaded: 1
   isActive: 1
-- path: Assets/Scenes/ShadersTutorial.unity
+- path: Assets/Obsolate/Scenes/ShadersTutorial.unity
   isLoaded: 0
   isActive: 0

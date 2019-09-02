@@ -11,23 +11,25 @@ public class WorldGenerator : MonoBehaviour
 	public float m_size = 1.0f;
 	public float m_radius = 5.0f;
 	public int m_LOD = 0;
+	public bool m_recalculateNormals = false;
 	public ComputeShader m_MarchingCubesShader;
 	public ComputeShader m_FillBufferShader;
 	public ComputeShader m_calculateNormalsShader;
 
-	float[] m_densityMap;
+	[HideInInspector] public float[] m_densityMap;
 
 	MarchingCubes mc;
 
 	Mesh mesh;
 
-	void Start ()
+	void Awake ()
 	{
 		mesh = new Mesh();
 		mc = new MarchingCubes();
 		mc.m_marchingCubesShader = m_MarchingCubesShader;
 		mc.m_clearVerticesShader = m_FillBufferShader;
 		mc.m_calculateNormalsShader = m_calculateNormalsShader;
+		mc.m_recalculateNormals = m_recalculateNormals;
 		mc.Initalize(m_x_dim, m_y_dim, m_z_dim, m_size, m_LOD);
 		m_densityMap = new float[m_x_dim * m_y_dim * m_z_dim];
 		//Random.InitState(20);
@@ -52,10 +54,11 @@ public class WorldGenerator : MonoBehaviour
 			{
 				for(int x = 0; x < m_x_dim; x++)
 				{
-					m_densityMap[x + y * m_x_dim + z * m_x_dim * m_y_dim] = -y / (m_y_dim / 2) + 1;
+					m_densityMap[x + y * m_x_dim + z * m_x_dim * m_y_dim] = -y / (m_y_dim / 2f) + 1f;
 				}
 			}
 		}*/
+
 	}
 	
 	void Update ()
@@ -69,7 +72,7 @@ public class WorldGenerator : MonoBehaviour
 			mesh = mc.ComputeMesh(m_densityMap);
 			GetComponent<MeshFilter>().mesh = mesh;
 			GetComponent<MeshCollider>().sharedMesh = mesh;
-			DrawNormals(mesh);
+			//DrawNormals(mesh);
 		}
 	}
 

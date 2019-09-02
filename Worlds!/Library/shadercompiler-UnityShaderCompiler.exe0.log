@@ -3,85 +3,137 @@ Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
 Cmd: preprocessCompute
-  insize=951 outsize=950 ok=1
+  insize=5000 outsize=4999 ok=1
 Cmd: compileComputeKernel
-  api=4 insize=950 outsize=1449 ok=1
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
+  api=4 insize=4999 outsize=8073 ok=1
 Cmd: initializeCompiler
 Cmd: preprocessCompute
-  insize=5149 outsize=5148 ok=1
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
+  insize=5000 outsize=4999 ok=1
 Cmd: preprocessCompute
-  insize=978 outsize=977 ok=1
-Cmd: initializeCompiler
-Cmd: preprocessCompute
-  insize=999 outsize=998 ok=1
+  insize=1858 outsize=1857 ok=1
 Cmd: compileComputeKernel
-  api=4 insize=998 outsize=1553 ok=1
+  api=4 insize=1857 outsize=1225 ok=1
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: preprocessCompute
+  insize=874 outsize=873 ok=1
+Cmd: initializeCompiler
+Cmd: preprocessCompute
+  insize=5003 outsize=5002 ok=1
+Cmd: compileComputeKernel
+  error: 2 plat 4 at MarchingCubes.compute(74): the product of the arguments of numthreads(16,16,16) must be less than or equal to 1024
+  api=4 insize=5002 outsize=0 ok=0
+Cmd: preprocessCompute
+  insize=877 outsize=876 ok=1
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: preprocessCompute
+  insize=5000 outsize=4999 ok=1
+Cmd: preprocessCompute
+  insize=874 outsize=873 ok=1
+Cmd: initializeCompiler
+Cmd: preprocessCompute
+  insize=5001 outsize=5000 ok=1
+Cmd: compileComputeKernel
+  error: 2 plat 4 at MarchingCubes.compute(74): the product of the arguments of numthreads(16,16,16) must be less than or equal to 1024
+  api=4 insize=5000 outsize=0 ok=0
+Cmd: initializeCompiler
+Cmd: preprocessCompute
+  insize=5000 outsize=4999 ok=1
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: preprocessCompute
   insize=415 outsize=414 ok=1
 Cmd: preprocessCompute
-  insize=243 outsize=242 ok=1
+  insize=5646 outsize=5645 ok=1
+Cmd: preprocessCompute
+  insize=5648 outsize=5647 ok=1
 Cmd: compileComputeKernel
-  api=4 insize=242 outsize=545 ok=1
-Cmd: initializeCompiler
+  api=4 insize=5647 outsize=8073 ok=1
 Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: preprocessCompute
-  insize=5152 outsize=5151 ok=1
+  insize=5656 outsize=5655 ok=1
 Cmd: compileComputeKernel
-  api=4 insize=5151 outsize=8321 ok=1
-Cmd: preprocessCompute
-  insize=978 outsize=977 ok=1
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
+  api=4 insize=5655 outsize=8073 ok=1
 Cmd: initializeCompiler
 Cmd: preprocessCompute
-  insize=1393 outsize=1392 ok=1
+  insize=5668 outsize=5667 ok=1
 Cmd: compileComputeKernel
-  api=4 insize=1392 outsize=1437 ok=1
-Cmd: initializeCompiler
-Cmd: initializeCompiler
+  error: 2 plat 4 at MarchingCubes.compute(75): 'RecalculateNormals': output parameter 'v_a' not completely initialized
+  api=4 insize=5667 outsize=0 ok=0
 Cmd: preprocessCompute
-  insize=1856 outsize=1855 ok=1
-Cmd: preprocessCompute
-  insize=1858 outsize=1857 ok=1
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: preprocessCompute
-  insize=5140 outsize=5139 ok=1
+  insize=5668 outsize=5667 ok=1
 Cmd: compileComputeKernel
-  api=4 insize=5139 outsize=8489 ok=1
+  error: 2 plat 4 at MarchingCubes.compute(75): unrecognized identifier 'ref'
+  api=4 insize=5667 outsize=0 ok=0
+Cmd: preprocessCompute
+  insize=5676 outsize=5675 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=5675 outsize=8073 ok=1
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: disassembleShader
+  api=4 insize=7468 outsize=10403 ok=1
+Cmd: preprocessCompute
+  insize=5910 outsize=5909 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=5909 outsize=8609 ok=1
 Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: preprocessCompute
-  insize=5130 outsize=5129 ok=1
+  insize=5831 outsize=5830 ok=1
 Cmd: compileComputeKernel
-  api=4 insize=5129 outsize=8705 ok=1
+  api=4 insize=5830 outsize=8609 ok=1
 Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: initializeCompiler
-Cmd: preprocessCompute
-  insize=5130 outsize=5129 ok=1
-Cmd: compileComputeKernel
-  api=4 insize=5129 outsize=8417 ok=1
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: initializeCompiler
