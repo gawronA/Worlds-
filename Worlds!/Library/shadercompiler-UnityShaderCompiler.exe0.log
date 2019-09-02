@@ -6,6 +6,10 @@ Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: initializeCompiler
+Cmd: compileSnippet
+  api=4 type=0 insize=725 outsize=858 kw=ETC1_EXTERNAL_ALPHA pd=UNITY_ENABLE_REFLECTION_BUFFERS UNITY_USE_DITHER_MASK_FOR_ALPHABLENDED_SHADOWS UNITY_PBS_USE_BRDF1 UNITY_SPECCUBE_BOX_PROJECTION UNITY_SPECCUBE_BLENDING UNITY_ENABLE_DETAIL_NORMALMAP SHADER_API_DESKTOP UNITY_COLORSPACE_GAMMA UNITY_LIGHT_PROBE_PROXY_VOLUME UNITY_LIGHTMAP_FULL_HDR ok=1
+Cmd: compileSnippet
+  api=4 type=1 insize=725 outsize=574 kw=ETC1_EXTERNAL_ALPHA pd=UNITY_ENABLE_REFLECTION_BUFFERS UNITY_USE_DITHER_MASK_FOR_ALPHABLENDED_SHADOWS UNITY_PBS_USE_BRDF1 UNITY_SPECCUBE_BOX_PROJECTION UNITY_SPECCUBE_BLENDING UNITY_ENABLE_DETAIL_NORMALMAP SHADER_API_DESKTOP UNITY_COLORSPACE_GAMMA UNITY_LIGHT_PROBE_PROXY_VOLUME UNITY_LIGHTMAP_FULL_HDR ok=1
 Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: initializeCompiler
@@ -18,112 +22,6 @@ Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: preprocessCompute
-  insize=5000 outsize=4999 ok=1
-Cmd: compileComputeKernel
-  api=4 insize=4999 outsize=8073 ok=1
-Cmd: initializeCompiler
-Cmd: preprocessCompute
-  insize=5000 outsize=4999 ok=1
-Cmd: preprocessCompute
-  insize=1858 outsize=1857 ok=1
-Cmd: compileComputeKernel
-  api=4 insize=1857 outsize=1225 ok=1
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: preprocessCompute
-  insize=874 outsize=873 ok=1
-Cmd: initializeCompiler
-Cmd: preprocessCompute
-  insize=5003 outsize=5002 ok=1
-Cmd: compileComputeKernel
-  error: 2 plat 4 at MarchingCubes.compute(74): the product of the arguments of numthreads(16,16,16) must be less than or equal to 1024
-  api=4 insize=5002 outsize=0 ok=0
-Cmd: preprocessCompute
-  insize=877 outsize=876 ok=1
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: preprocessCompute
-  insize=5000 outsize=4999 ok=1
-Cmd: preprocessCompute
-  insize=874 outsize=873 ok=1
-Cmd: initializeCompiler
-Cmd: preprocessCompute
-  insize=5001 outsize=5000 ok=1
-Cmd: compileComputeKernel
-  error: 2 plat 4 at MarchingCubes.compute(74): the product of the arguments of numthreads(16,16,16) must be less than or equal to 1024
-  api=4 insize=5000 outsize=0 ok=0
-Cmd: initializeCompiler
-Cmd: preprocessCompute
-  insize=5000 outsize=4999 ok=1
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: preprocessCompute
-  insize=415 outsize=414 ok=1
-Cmd: preprocessCompute
-  insize=5646 outsize=5645 ok=1
-Cmd: preprocessCompute
-  insize=5648 outsize=5647 ok=1
-Cmd: compileComputeKernel
-  api=4 insize=5647 outsize=8073 ok=1
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: preprocessCompute
-  insize=5656 outsize=5655 ok=1
-Cmd: compileComputeKernel
-  api=4 insize=5655 outsize=8073 ok=1
-Cmd: initializeCompiler
-Cmd: preprocessCompute
-  insize=5668 outsize=5667 ok=1
-Cmd: compileComputeKernel
-  error: 2 plat 4 at MarchingCubes.compute(75): 'RecalculateNormals': output parameter 'v_a' not completely initialized
-  api=4 insize=5667 outsize=0 ok=0
-Cmd: preprocessCompute
-  insize=5668 outsize=5667 ok=1
-Cmd: compileComputeKernel
-  error: 2 plat 4 at MarchingCubes.compute(75): unrecognized identifier 'ref'
-  api=4 insize=5667 outsize=0 ok=0
-Cmd: preprocessCompute
-  insize=5676 outsize=5675 ok=1
-Cmd: compileComputeKernel
-  api=4 insize=5675 outsize=8073 ok=1
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: disassembleShader
-  api=4 insize=7468 outsize=10403 ok=1
-Cmd: preprocessCompute
-  insize=5910 outsize=5909 ok=1
-Cmd: compileComputeKernel
-  api=4 insize=5909 outsize=8609 ok=1
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: preprocessCompute
-  insize=5831 outsize=5830 ok=1
-Cmd: compileComputeKernel
-  api=4 insize=5830 outsize=8609 ok=1
 Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: initializeCompiler

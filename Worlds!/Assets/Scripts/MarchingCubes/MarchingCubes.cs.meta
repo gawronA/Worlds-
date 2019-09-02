@@ -3,7 +3,13 @@ guid: 9c40552c69a57374c8c5fd4616007e04
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - m_marchingCubesShader: {fileID: 7200000, guid: 5accd0df264625845b084ad3587a684b,
+      type: 3}
+  - m_clearVerticesShader: {fileID: 7200000, guid: f94777e24265ec34190746726e245745,
+      type: 3}
+  - m_calculateNormalsShader: {fileID: 7200000, guid: 5be0259b2cf14c34181a89d175814980,
+      type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

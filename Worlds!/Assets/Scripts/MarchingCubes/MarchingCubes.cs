@@ -7,7 +7,7 @@ namespace ProceduralTerrain
 {
 	namespace MarchingCubes
 	{
-		public class MarchingCubes
+		public class MarchingCubes : ScriptableObject
 		{
 
 			public ComputeShader m_marchingCubesShader;
@@ -32,7 +32,7 @@ namespace ProceduralTerrain
 			ComputeBuffer m_cubeEdgeFlags, m_traingleConnectionTable;
 			ComputeBuffer m_meshBuffer, m_densityBuffer;
 
-			public RenderTexture m_normalsTexture;
+			RenderTexture m_normalsTexture;
 
 			#pragma warning disable 0649
 			struct Vertex
