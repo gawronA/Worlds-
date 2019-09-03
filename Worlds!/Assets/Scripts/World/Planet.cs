@@ -4,15 +4,17 @@ using UnityEngine;
 
 public class Planet : MonoBehaviour
 {
+	//info
+	string m_planet_name;
 
 	//chunks
 	[HideInInspector] public int m_chunk_res { get; protected set; }
 	[HideInInspector] public float m_chunk_scale { get; protected set; }
-	List<PlanetChunk> m_chunks;
+	List<GameObject> m_chunks;
 
-	void Start()
+	void Initalize(string planet_name)
 	{
-		m_chunk_res = 2;
+		
 	}
 	
 	// Update is called once per frame

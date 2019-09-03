@@ -31,6 +31,11 @@ public class NoiseTextureCreator : MonoBehaviour
 		FillTexture();
 	}
 
+	private void OnValidate()
+	{
+		FillTexture();
+	}
+
 	private void Update()
 	{
 		if(transform.hasChanged)
