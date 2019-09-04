@@ -8,13 +8,10 @@ public class PlanetGenerator : MonoBehaviour
 	public int m_est_border;
 	public float m_scale;
 	public int m_xyzResolution = 16;
+	public bool m_sharpEdges = false;
 
 	public GameObject m_planetPrefab;
 	public GameObject m_planetChunkPrefab;
-
-	public ComputeShader m_MarchingCubesShader;
-	public ComputeShader m_FillBufferShader;
-	public ComputeShader m_calculateNormalsShader;
 
 	[HideInInspector] public int m_length;
 	int m_length2;
@@ -33,7 +30,7 @@ public class PlanetGenerator : MonoBehaviour
 
 		center = new Vector3Int(m_length / 2, m_length / 2, m_length / 2);
 		m_densityMap = new float[m_length2 * m_length];
-		/*for(int z = 0; z < m_length; z++)
+		for(int z = 0; z < m_length; z++)
 		{
 			for(int y = 0; y < m_length; y++)
 			{
@@ -43,8 +40,8 @@ public class PlanetGenerator : MonoBehaviour
 					m_densityMap[x + y * m_length + z * m_length2] = Mathf.Clamp((-1.0f / m_radius) * point.magnitude + 1, -1.0f, 1.0f);
 				}
 			}
-		}*/
-		for(int z = 0; z < m_length; z++)
+		}
+		/*for(int z = 0; z < m_length; z++)
 		{
 			for(int y = 0; y < m_length; y++)
 			{
@@ -53,7 +50,7 @@ public class PlanetGenerator : MonoBehaviour
 					m_densityMap[x + y * m_length + z * m_length2] = x + y * m_length + z * m_length2;
 				}
 			}
-		}
+		}*/
 
 		InstantiatePlanet();
 
@@ -69,19 +66,21 @@ public class PlanetGenerator : MonoBehaviour
 
 	void InstantiatePlanet()
 	{
-		//GameObject planet = Instantiate(m_planetPrefab);
-		//planet.transform.position = Vector3.zero;
-		//planet.name = "Planet1";
+		GameObject planet = Instantiate(m_planetPrefab);
+		planet.transform.position = Vector3.zero;
+		planet.name = "Planet1";
 		for(int c_z = 0, id = 0; c_z < m_chunk_count; c_z++)
 		{
 			for(int c_y = 0; c_y < m_chunk_count; c_y++)
 			{
 				for(int c_x = 0; c_x < m_chunk_count; c_x++, id++)
 				{
-					int offset = c_x * (m_xyzResolution - c_x) + c_y * (m_xyzResolution - c_y) * m_length + c_z * (m_xyzResolution - c_z) * m_length2;
-					//GameObject chunkObj = Instantiate(m_planetChunkPrefab, planet.transform, false);
-					//PlanetChunk chunk = GetComponent<PlanetChunk>();
-					//chunk.Initalize(id, m_xyzResolution, m_scale);
+					int offset = c_x * (m_xyzResolution - 1) + c_y * (m_xyzResolution - 1) * m_length + c_z * (m_xyzResolution - 1) * m_length2;
+					
+					GameObject chunkObj = Instantiate(m_planetChunkPrefab, planet.transform, false);
+					chunkObj.name = planet.name + "_chunk" + id.ToString();
+					PlanetChunk chunk = chunkObj.GetComponent<PlanetChunk>();
+					chunk.Initalize(id, m_xyzResolution, m_scale, m_sharpEdges);
 
 					float[] densityMap = new float[m_xyzResolution * m_xyzResolution * m_xyzResolution];
 					for(int z = 0; z < m_xyzResolution; z++)
@@ -95,7 +94,9 @@ public class PlanetGenerator : MonoBehaviour
 							}
 						}
 					}
-					int debug_dummy = 2;
+
+					chunk.SetDensityMap(densityMap);
+					chunk.Refresh();
 				}
 			}
 		}

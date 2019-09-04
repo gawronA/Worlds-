@@ -33,7 +33,10 @@ public class NoiseTextureCreator : MonoBehaviour
 
 	private void OnValidate()
 	{
-		FillTexture();
+		if(texture != null)
+		{
+			FillTexture();
+		}
 	}
 
 	private void Update()

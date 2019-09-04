@@ -131,14 +131,14 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1507474
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1507473}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 67d3321b59449d149b4cc965151ac32c, type: 3}
   m_Name: 
@@ -217,7 +217,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &116942345
 GameObject:
@@ -494,47 +494,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   changePosition: 0
   position: 0
---- !u!1 &1160290512
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1160290514}
-  - component: {fileID: 1160290513}
-  m_Layer: 0
-  m_Name: Planet
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!114 &1160290513
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1160290512}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 220b3e729a1b2f447b6c1e3a5a0a4ec4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!4 &1160290514
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1160290512}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -11.2573185, y: 6.1223664, z: 0.34851074}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children:
-  - {fileID: 1482886720}
-  m_Father: {fileID: 0}
-  m_RootOrder: 4
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1307534188
 GameObject:
   m_ObjectHideFlags: 0
@@ -562,17 +521,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3eda1b167500c60448dfbfe846f7c625, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_radius: 5
-  m_est_border: 0
+  m_radius: 10
+  m_est_border: 10
   m_scale: 1
-  m_xyzResolution: 2
-  m_planetPrefab: {fileID: 0}
-  m_planetChunkPrefab: {fileID: 0}
-  m_MarchingCubesShader: {fileID: 7200000, guid: 5accd0df264625845b084ad3587a684b,
-    type: 3}
-  m_FillBufferShader: {fileID: 7200000, guid: f94777e24265ec34190746726e245745, type: 3}
-  m_calculateNormalsShader: {fileID: 7200000, guid: 5be0259b2cf14c34181a89d175814980,
-    type: 3}
+  m_xyzResolution: 16
+  m_sharpEdges: 0
+  m_planetPrefab: {fileID: 1800079048482476, guid: 10b88e84e1d50274a818277016a46396,
+    type: 2}
+  m_planetChunkPrefab: {fileID: 1183231140867592, guid: 95ff09b99cb48ad42a3d3b49daf3ab1d,
+    type: 2}
   m_length: 0
   m_densityMap: []
 --- !u!4 &1307534190
@@ -589,90 +546,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1482886719
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1482886720}
-  - component: {fileID: 1482886723}
-  - component: {fileID: 1482886722}
-  - component: {fileID: 1482886721}
-  m_Layer: 0
-  m_Name: PlanetChunk1
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1482886720
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1482886719}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 1160290514}
-  m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!23 &1482886721
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1482886719}
-  m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RenderingLayerMask: 4294967295
-  m_Materials:
-  - {fileID: 0}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 0
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
---- !u!33 &1482886722
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1482886719}
-  m_Mesh: {fileID: 0}
---- !u!114 &1482886723
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1482886719}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c99df215da7856143a395fd1980820bd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &2099118541
 Prefab:
   m_ObjectHideFlags: 0

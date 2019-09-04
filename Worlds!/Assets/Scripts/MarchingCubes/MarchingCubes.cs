@@ -7,7 +7,7 @@ namespace ProceduralTerrain
 {
 	namespace MarchingCubes
 	{
-		public class MarchingCubes : ScriptableObject
+		public class MarchingCubes
 		{
 
 			public ComputeShader m_marchingCubesShader;
