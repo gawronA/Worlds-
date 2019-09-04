@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using ProceduralTerrain.MarchingCubes;
 
-public class PlanetChunk : MonoBehaviour
+public unsafe class PlanetChunk : MonoBehaviour
 {
 	Planet m_planet;
 
@@ -16,15 +16,19 @@ public class PlanetChunk : MonoBehaviour
 	float[] m_densityMap;
 
 	MeshFilter m_meshFilter;
+	MeshCollider m_meshCollider;
 
 	MarchingCubes m_mc;
 	public ComputeShader m_MarchingCubesShader;
 	public ComputeShader m_ClearVerticesShader;
 	public ComputeShader m_CalculateNormalsShader;
-	
+
+	//density map normal pointers
+	PlanetChunk m_xChunk, m_yChunk, m_zChunk;
 
 	void Start ()
 	{
+
 	}
 	
 	void Update ()
@@ -43,6 +47,7 @@ public class PlanetChunk : MonoBehaviour
 		m_scale = scale;
 
 		m_meshFilter = GetComponent<MeshFilter>();
+		m_meshCollider = GetComponent<MeshCollider>();
 
 		m_mc = new MarchingCubes();
 		m_mc.m_marchingCubesShader = m_MarchingCubesShader;
@@ -63,6 +68,22 @@ public class PlanetChunk : MonoBehaviour
 
 		m_meshFilter.mesh.Clear();
 		m_meshFilter.mesh = mesh;
+
+		m_meshCollider.sharedMesh = mesh;
 	}
 
+	public void AssignXChunk(PlanetChunk x_chunk)
+	{
+		m_xChunk = x_chunk;
+	}
+	
+	public void AssignYChunk(PlanetChunk y_chunk)
+	{
+		m_yChunk = y_chunk;
+	}
+
+	public void AssignZChunk(PlanetChunk z_chunk)
+	{
+		m_zChunk = z_chunk;
+	}
 }

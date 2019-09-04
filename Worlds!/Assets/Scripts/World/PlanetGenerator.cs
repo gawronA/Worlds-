@@ -66,9 +66,13 @@ public class PlanetGenerator : MonoBehaviour
 
 	void InstantiatePlanet()
 	{
-		GameObject planet = Instantiate(m_planetPrefab);
-		planet.transform.position = Vector3.zero;
-		planet.name = "Planet1";
+		GameObject planetObj = Instantiate(m_planetPrefab);
+		planetObj.transform.position = Vector3.zero;
+		planetObj.name = "Planet1";
+
+		Planet planet = planetObj.GetComponent<Planet>();
+		planet.Initalize(m_chunk_count);
+
 		for(int c_z = 0, id = 0; c_z < m_chunk_count; c_z++)
 		{
 			for(int c_y = 0; c_y < m_chunk_count; c_y++)
@@ -77,8 +81,11 @@ public class PlanetGenerator : MonoBehaviour
 				{
 					int offset = c_x * (m_xyzResolution - 1) + c_y * (m_xyzResolution - 1) * m_length + c_z * (m_xyzResolution - 1) * m_length2;
 					
-					GameObject chunkObj = Instantiate(m_planetChunkPrefab, planet.transform, false);
-					chunkObj.name = planet.name + "_chunk" + id.ToString();
+					GameObject chunkObj = Instantiate(m_planetChunkPrefab, planetObj.transform, false);
+					chunkObj.name = planetObj.name + "_chunk" + id.ToString();
+					chunkObj.transform.position = new Vector3(c_x * (m_xyzResolution - 1), c_y * (m_xyzResolution - 1), c_z * (m_xyzResolution - 1)) * m_scale;
+					planet.AddChunk(chunkObj);
+
 					PlanetChunk chunk = chunkObj.GetComponent<PlanetChunk>();
 					chunk.Initalize(id, m_xyzResolution, m_scale, m_sharpEdges);
 
