@@ -67,7 +67,7 @@ Vertex CreateVertex(float3 position, float3 normalsTextureSize)
     Vertex vert;
     vert.position = float4(position * _Scale, 1.0f);
 
-	float3 uv = (position) / normalsTextureSize;
+	float3 uv = position / normalsTextureSize;
 	vert.normal = _Normals.SampleLevel(_LinearClamp, uv, 0);
     return vert;
 }

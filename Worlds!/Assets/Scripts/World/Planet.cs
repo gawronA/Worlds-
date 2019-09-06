@@ -5,18 +5,17 @@ using UnityEngine;
 public class Planet : MonoBehaviour
 {
 	//info
-	//string m_planet_name;
 
 	//chunks
-	//[HideInInspector] public int m_chunk_res { get; protected set; }
-	//[HideInInspector] public float m_chunk_scale { get; protected set; }
 	int m_chunkLength;
+	int m_chunkRes;
 	List<GameObject> m_chunkObjs;
 	List<PlanetChunk> m_chunks;
 
-	public void Initalize(int chunkLength)
+	public void Initalize(int chunkLength, int chunkRes)
 	{
 		m_chunkLength = chunkLength;
+		m_chunkRes = chunkRes;
 		m_chunkObjs = new List<GameObject>(m_chunkLength * m_chunkLength * m_chunkLength);
 		m_chunks = new List<PlanetChunk>(m_chunkLength * m_chunkLength * m_chunkLength);
 	}
@@ -27,17 +26,24 @@ public class Planet : MonoBehaviour
 		m_chunks.Add(chunk.GetComponent<PlanetChunk>());
 	}
 
-	public void AssignChunkNeighbours()
+	public void AssignChunkNeighboursAndRefresh()
 	{
-		for(int z = 0, i = 0; z < m_chunkLength - 1; z++)
+		int chunkLength = m_chunkLength;
+		int chunkLength2 = m_chunkLength * m_chunkLength;
+		float[] dummyMap = new float[m_chunkRes * m_chunkRes * m_chunkRes];
+		for(int z = 0, i = 0; z < chunkLength; z++)
 		{
-			for(int y = 0; y < m_chunkLength - 1; y++)
+			for(int y = 0; y < chunkLength; y++)
 			{
-				for(int x = 0; x < m_chunkLength - 1; x++, i++)
+				for(int x = 0; x < chunkLength; x++, i++)
 				{
-					m_chunks[i].AssignXChunk(m_chunks[(x + 1) + y * m_chunkLength + z * m_chunkLength * m_chunkLength]);
-					m_chunks[i].AssignYChunk(m_chunks[x + (y + 1) * m_chunkLength + z * m_chunkLength * m_chunkLength]);
-					m_chunks[i].AssignZChunk(m_chunks[x + y * m_chunkLength + (z + 1) * m_chunkLength * m_chunkLength]);
+					if(x != chunkLength - 1) m_chunks[i].AssignXChunkMap(m_chunks[i + 1].m_densityMap);
+					else m_chunks[i].AssignXChunkMap(dummyMap);
+					if(y != chunkLength - 1) m_chunks[i].AssignYChunkMap(m_chunks[i + chunkLength].m_densityMap);
+					else m_chunks[i].AssignYChunkMap(dummyMap);
+					if(z != chunkLength - 1) m_chunks[i].AssignZChunkMap(m_chunks[i + chunkLength2].m_densityMap);
+					else m_chunks[i].AssignZChunkMap(dummyMap);
+					m_chunks[i].Refresh();
 				}
 			}
 		}

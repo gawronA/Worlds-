@@ -27,10 +27,10 @@ namespace ProceduralTerrain
 			int m_x_lod_dim;
 			int m_y_lod_dim;
 			int m_z_lod_dim;
-			float[] m_densityMap;
 			
 			ComputeBuffer m_cubeEdgeFlags, m_traingleConnectionTable;
-			ComputeBuffer m_meshBuffer, m_densityBuffer;
+			ComputeBuffer m_meshBuffer;
+			ComputeBuffer m_densityBuffer, m_ChunkXdensityBuffer, m_ChunkYdensityBuffer, m_ChunkZdensityBuffer;
 
 			RenderTexture m_normalsTexture;
 
@@ -77,13 +77,18 @@ namespace ProceduralTerrain
 				//output mesh. 
 				m_meshBuffer = new ComputeBuffer(m_maxVertices, sizeof(float) * 7);
 				m_densityBuffer = new ComputeBuffer(m_x_dim * m_y_dim * m_z_dim, sizeof(float));
+				m_ChunkXdensityBuffer = new ComputeBuffer(m_y_dim * m_z_dim, sizeof(float));
+				m_ChunkYdensityBuffer = new ComputeBuffer(m_x_dim * m_z_dim, sizeof(float));
+				m_ChunkZdensityBuffer = new ComputeBuffer(m_x_dim * m_y_dim, sizeof(float));
 
 				//normals
-				m_normalsTexture = new RenderTexture(m_x_dim, m_y_dim, 0, RenderTextureFormat.ARGBHalf, RenderTextureReadWrite.Linear);
-				m_normalsTexture.dimension = UnityEngine.Rendering.TextureDimension.Tex3D;
-				m_normalsTexture.volumeDepth = m_z_dim;
-				m_normalsTexture.enableRandomWrite = true;
-				m_normalsTexture.useMipMap = false;
+				m_normalsTexture = new RenderTexture(m_x_dim, m_y_dim, 0, RenderTextureFormat.ARGBHalf, RenderTextureReadWrite.Linear)
+				{
+					dimension = UnityEngine.Rendering.TextureDimension.Tex3D,
+					volumeDepth = m_z_dim,
+					enableRandomWrite = true,
+					useMipMap = false
+				};
 				m_normalsTexture.Create();
 
 				//initalize variables in MC, ClearVertices, initalize normals shader
@@ -92,14 +97,30 @@ namespace ProceduralTerrain
 				InitNormals();
 			}
 
-			public Mesh ComputeMesh(float[] densityMap)
+			/// <summary>
+			/// Calculate with normals on borders
+			/// </summary>
+			/// <param name="densityMap"></param>
+			/// <param name="borderMapx"></param>
+			/// <param name="borderMapy"></param>
+			/// <param name="borderMapz"></param>
+			/// <returns></returns>
+			public Mesh ComputeMesh(float[] densityMap, float[] borderMapx, float[] borderMapy, float[] borderMapz)
 			{
 				m_densityBuffer.SetData(densityMap);
+				m_ChunkXdensityBuffer.SetData(borderMapx);
+				m_ChunkYdensityBuffer.SetData(borderMapy);
+				m_ChunkZdensityBuffer.SetData(borderMapz);
+
 				//Clear vertices
+				m_clearVerticesShader.SetBuffer(0, "_Vertices", m_meshBuffer);
 				m_clearVerticesShader.Dispatch(0, m_x_lod_dim / (8 / m_lod), m_y_lod_dim / (8 / m_lod), m_z_lod_dim / (8 / m_lod));
 
 				//Calculate normals
 				m_calculateNormalsShader.SetBuffer(0, "_DensityMap", m_densityBuffer);
+				m_calculateNormalsShader.SetBuffer(0, "_BorderMapx", m_ChunkXdensityBuffer);
+				m_calculateNormalsShader.SetBuffer(0, "_BorderMapy", m_ChunkYdensityBuffer);
+				m_calculateNormalsShader.SetBuffer(0, "_BorderMapz", m_ChunkZdensityBuffer);
 				m_calculateNormalsShader.SetTexture(0, "_Normals", m_normalsTexture);
 				m_calculateNormalsShader.Dispatch(0, m_x_dim / 8, m_y_dim / 8, m_z_dim / 8);
 
@@ -134,7 +155,7 @@ namespace ProceduralTerrain
 
 				return mesh;
 			}
-			
+
 			private void InitMC()
 			{
 				m_marchingCubesShader.SetInt("_DensityMap_sizex", m_x_dim);
@@ -172,6 +193,9 @@ namespace ProceduralTerrain
 				m_traingleConnectionTable.Release();
 				m_meshBuffer.Release();
 				m_densityBuffer.Release();
+				m_ChunkXdensityBuffer.Release();
+				m_ChunkYdensityBuffer.Release();
+				m_ChunkZdensityBuffer.Release();
 			}
 		}
 	}

@@ -53,10 +53,6 @@ public class PlanetGenerator : MonoBehaviour
 		}*/
 
 		InstantiatePlanet();
-
-		Debug.Log("number of chunks in one direction" + m_chunk_count.ToString());
-		Debug.Log("actual length" + m_length.ToString());
-		Debug.Log("center" + center.ToString());
 	}
 	
 	void Update ()
@@ -71,7 +67,7 @@ public class PlanetGenerator : MonoBehaviour
 		planetObj.name = "Planet1";
 
 		Planet planet = planetObj.GetComponent<Planet>();
-		planet.Initalize(m_chunk_count);
+		planet.Initalize(m_chunk_count, m_xyzResolution);
 
 		for(int c_z = 0, id = 0; c_z < m_chunk_count; c_z++)
 		{
@@ -101,11 +97,10 @@ public class PlanetGenerator : MonoBehaviour
 							}
 						}
 					}
-
 					chunk.SetDensityMap(densityMap);
-					chunk.Refresh();
 				}
 			}
 		}
+		planet.AssignChunkNeighboursAndRefresh();
 	}
 }

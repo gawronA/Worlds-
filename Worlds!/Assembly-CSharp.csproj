@@ -77,7 +77,6 @@
     <Compile Include="Assets\Scripts\World\Planet.cs" />
     <Compile Include="Assets\Scripts\World\PlanetChunk.cs" />
     <Compile Include="Assets\Scripts\World\PlanetGenerator.cs" />
-    <Compile Include="Assets\Scripts\World\WorldGenerator.cs" />
     <None Include="Assets\Shaders\MarchingCubes\Normals.compute" />
     <None Include="Assets\Shaders\MarchingCubes\ClearVerticesShader.compute" />
     <None Include="Assets\Scripts\ShaderTutorial\Part 2 First Shader\Textured With Detail.shader" />
