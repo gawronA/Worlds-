@@ -18,6 +18,8 @@ bool _RecalculateNormals;
 StructuredBuffer<int> _TriangleConnectionTable;
 StructuredBuffer<int> _CubeEdgeFlags;
 StructuredBuffer<float> _DensityMap;
+StructuredBuffer<float> _BorderMapx, _BorderMapy, _BorderMapz, _BorderMapxy, _BorderMapyz, _BorderMapxz;
+float _BorderMapxyz;
 Texture3D<float3> _Normals;
 RWStructuredBuffer<Vertex> _Vertices;
 
@@ -55,6 +57,111 @@ void FillCell(int x, int y, int z, out float cell[8])
     cell[7] = _DensityMap[x * _Lod + (y + 1) * _Lod * _DensityMap_sizex + (z + 1) * _Lod * _DensityMap_sziexy];
 }
 
+void FillCellX(int x, int y, int z, out float cell[8])
+{
+	int _DensityMap_sziexy = _DensityMap_sizex * _DensityMap_sizey;
+    cell[0] = _DensityMap[x * _Lod + y * _Lod * _DensityMap_sizex + z * _Lod * _DensityMap_sziexy];
+	cell[1] = _BorderMapx[y * _Lod + z * _Lod * _DensityMap_sizey];
+	cell[2] = _BorderMapx[(y + 1) * _Lod + z * _Lod *_DensityMap_sizey];
+    cell[3] = _DensityMap[x * _Lod + (y + 1) * _Lod * _DensityMap_sizex + z * _Lod * _DensityMap_sziexy];
+    
+	cell[4] = _DensityMap[x * _Lod + y * _Lod * _DensityMap_sizex + (z + 1) * _Lod * _DensityMap_sziexy];
+	cell[5] = _BorderMapx[y * _Lod + (z + 1) * _Lod * _DensityMap_sizey];
+	cell[6] = _BorderMapx[(y + 1) * _Lod + (z + 1) * _Lod * _DensityMap_sizey];
+    cell[7] = _DensityMap[x * _Lod + (y + 1) * _Lod * _DensityMap_sizex + (z + 1) * _Lod * _DensityMap_sziexy];
+}
+
+void FillCellY(int x, int y, int z, out float cell[8])
+{
+	int _DensityMap_sziexy = _DensityMap_sizex * _DensityMap_sizey;
+    cell[0] = _DensityMap[x * _Lod + y * _Lod * _DensityMap_sizex + z * _Lod * _DensityMap_sziexy];
+    cell[1] = _DensityMap[(x + 1) * _Lod + y * _Lod * _DensityMap_sizex + z * _Lod * _DensityMap_sziexy];
+	cell[2] = _BorderMapy[(x + 1) * _Lod + z * _Lod * _DensityMap_sizex];
+	cell[3] = _BorderMapy[x * _Lod + z * _Lod * _DensityMap_sizex];
+    
+	cell[4] = _DensityMap[x * _Lod + y * _Lod * _DensityMap_sizex + (z + 1) * _Lod * _DensityMap_sziexy];
+	cell[5] = _DensityMap[(x + 1) * _Lod + y * _Lod * _DensityMap_sizex + (z + 1) * _Lod * _DensityMap_sziexy];
+	cell[6] = _BorderMapy[(x + 1) * _Lod + (z + 1) * _Lod * _DensityMap_sizex];
+	cell[7] = _BorderMapy[x * _Lod + (z + 1) * _Lod * _DensityMap_sizex];
+}
+
+void FillCellZ(int x, int y, int z, out float cell[8])
+{
+	int _DensityMap_sziexy = _DensityMap_sizex * _DensityMap_sizey;
+    cell[0] = _DensityMap[x * _Lod + y * _Lod * _DensityMap_sizex + z * _Lod * _DensityMap_sziexy];
+    cell[1] = _DensityMap[(x + 1) * _Lod + y * _Lod * _DensityMap_sizex + z * _Lod * _DensityMap_sziexy];
+    cell[2] = _DensityMap[((x + 1) * _Lod) + ((y + 1) * _Lod * _DensityMap_sizex) + (z * _Lod * _DensityMap_sziexy)];
+    cell[3] = _DensityMap[x * _Lod + (y + 1) * _Lod * _DensityMap_sizex + z * _Lod * _DensityMap_sziexy];
+    
+	cell[4] = _BorderMapz[x * _Lod + y * _Lod * _DensityMap_sizex];
+	cell[5] = _BorderMapz[(x + 1) * _Lod + y * _Lod * _DensityMap_sizex];
+	cell[6] = _BorderMapz[(x + 1) * _Lod + (y + 1) * _Lod * _DensityMap_sizex];
+	cell[7] = _BorderMapz[x * _Lod + (y + 1) * _Lod * _DensityMap_sizex];
+}
+
+void FillCellXY(int x, int y, int z, out float cell[8])
+{
+	int _DensityMap_sziexy = _DensityMap_sizex * _DensityMap_sizey;
+    cell[0] = _DensityMap[x * _Lod + y * _Lod * _DensityMap_sizex + z * _Lod * _DensityMap_sziexy];
+	cell[1] = _BorderMapx[y * _Lod + z * _Lod * _DensityMap_sizey];
+	cell[2] = _BorderMapxy[z * _Lod];
+	cell[3] = _BorderMapy[x * _Lod + z * _Lod * _DensityMap_sizex];
+    
+	cell[4] = _DensityMap[x * _Lod + y * _Lod * _DensityMap_sizex + (z + 1) * _Lod * _DensityMap_sziexy];
+	cell[5] = _BorderMapx[y * _Lod + (z + 1) * _Lod * _DensityMap_sizey];
+	cell[6] = _BorderMapxy[(z + 1) * _Lod];
+	cell[7] = _BorderMapy[x * _Lod + (z + 1) * _Lod * _DensityMap_sizex];
+}
+
+void FillCellYZ(int x, int y, int z, out float cell[8])
+{
+	int _DensityMap_sziexy = _DensityMap_sizex * _DensityMap_sizey;
+    cell[0] = _DensityMap[x * _Lod + y * _Lod * _DensityMap_sizex + z * _Lod * _DensityMap_sziexy];
+	cell[1] = _DensityMap[(x + 1) * _Lod + y * _Lod * _DensityMap_sizex + z * _Lod * _DensityMap_sziexy];
+	cell[2] = _BorderMapy[(x + 1) * _Lod + z * _Lod * _DensityMap_sizex];
+	cell[3] = _BorderMapy[x * _Lod + z * _Lod * _DensityMap_sizex];
+    
+	cell[4] = _BorderMapz[x * _Lod + y * _Lod * _DensityMap_sizex];
+	cell[5] = _BorderMapz[(x + 1) * _Lod + y * _Lod * _DensityMap_sizex];
+	cell[6] = _BorderMapyz[(x + 1) * _Lod];
+	cell[7] = _BorderMapyz[x * _Lod];
+}
+
+void FillCellXZ(int x, int y, int z, out float cell[8])
+{
+	int _DensityMap_sziexy = _DensityMap_sizex * _DensityMap_sizey;
+    cell[0] = _DensityMap[x * _Lod + y * _Lod * _DensityMap_sizex + z * _Lod * _DensityMap_sziexy];
+	cell[1] = _BorderMapx[y * _Lod + z * _Lod * _DensityMap_sizey];
+	cell[2] = _BorderMapx[(y + 1) * _Lod + z * _Lod * _DensityMap_sizey];
+    cell[3] = _DensityMap[x * _Lod + (y + 1) * _Lod * _DensityMap_sizex + z * _Lod * _DensityMap_sziexy];
+    
+	cell[4] = _BorderMapz[x * _Lod + y * _Lod * _DensityMap_sizex];
+	cell[5] = _BorderMapxz[y * _Lod];
+	cell[6] = _BorderMapxz[(y + 1) * _Lod];
+	cell[7] = _BorderMapz[x * _Lod + (y + 1) * _Lod * _DensityMap_sizex];
+}
+
+void FillCellXYZ(int x, int y, int z, out float cell[8])
+{
+	int _DensityMap_sziexy = _DensityMap_sizex * _DensityMap_sizey;
+    cell[0] = _DensityMap[x * _Lod + y * _Lod * _DensityMap_sizex + z * _Lod * _DensityMap_sziexy];
+	cell[1] = _BorderMapx[y * _Lod + z * _Lod * _DensityMap_sizey];
+	cell[2] = _BorderMapxy[z * _Lod];
+	cell[3] = _BorderMapy[x * _Lod + z * _Lod * _DensityMap_sizex];
+    //cell[1] = _DensityMap[(x + 1) * _Lod + y * _Lod * _DensityMap_sizex + z * _Lod * _DensityMap_sziexy];
+   // cell[2] = _DensityMap[((x + 1) * _Lod) + ((y + 1) * _Lod * _DensityMap_sizex) + (z * _Lod * _DensityMap_sziexy)];
+   // cell[3] = _DensityMap[x * _Lod + (y + 1) * _Lod * _DensityMap_sizex + z * _Lod * _DensityMap_sziexy];
+    
+	cell[4] = _BorderMapz[x * _Lod + y * _Lod * _DensityMap_sizex];
+	cell[5] = _BorderMapxz[y * _Lod];
+	cell[6] = _BorderMapxyz;
+	cell[7] = _BorderMapyz[x * _Lod];
+//	cell[4] = _DensityMap[x * _Lod + y * _Lod * _DensityMap_sizex + (z + 1) * _Lod * _DensityMap_sziexy];
+	//cell[5] = _DensityMap[(x + 1) * _Lod + y * _Lod * _DensityMap_sizex + (z + 1) * _Lod * _DensityMap_sziexy];
+  //  cell[6] = _DensityMap[(x + 1) * _Lod + (y + 1) * _Lod * _DensityMap_sizex + (z + 1) * _Lod * _DensityMap_sziexy];
+   // cell[7] = _DensityMap[x * _Lod + (y + 1) * _Lod * _DensityMap_sizex + (z + 1) * _Lod * _DensityMap_sziexy];
+}
+
 float CalculateOffset(float v1, float v2)
 {
     float delta = v2 - v1;
@@ -85,7 +192,7 @@ float3 CalculateNormal(Vertex v_a, Vertex v_b, Vertex v_c)
 [numthreads(8, 8, 8)]
 void CSMain(uint3 id : SV_DispatchThreadID)
 {
-    if((id.x >= _DensityMap_sizex / _Lod - 1) || (id.y >= _DensityMap_sizey / _Lod - 1) || (id.z >= _DensityMap_sizez / _Lod - 1))
+    if((id.x > _DensityMap_sizex / _Lod - 1) || (id.y > _DensityMap_sizey / _Lod - 1) || (id.z > _DensityMap_sizez / _Lod - 1))
         return;
     
 	int i;
@@ -94,7 +201,14 @@ void CSMain(uint3 id : SV_DispatchThreadID)
     float3 edgeVertex[12];
 
 //fill the cube with density at corners
-    FillCell(id.x, id.y, id.z, cube);
+	if((id.x == _DensityMap_sizex / _Lod - 1) && (id.y == _DensityMap_sizey / _Lod - 1) && (id.z == _DensityMap_sizez / _Lod - 1)) FillCellXYZ(id.x, id.y, id.z, cube); //xyz na maxie
+	else if((id.x == _DensityMap_sizex / _Lod - 1) && (id.z == _DensityMap_sizez / _Lod - 1)) FillCellXZ(id.x, id.y, id.z, cube); //xz na maxie
+	else if((id.y == _DensityMap_sizey / _Lod - 1) && (id.z == _DensityMap_sizez / _Lod - 1)) FillCellYZ(id.x, id.y, id.z, cube); //yz na maxie
+	else if((id.x == _DensityMap_sizex / _Lod - 1) && (id.y == _DensityMap_sizey / _Lod - 1)) FillCellXY(id.x, id.y, id.z, cube); //xy na maxie
+	else if((id.z == _DensityMap_sizez / _Lod - 1)) 	FillCellZ(id.x, id.y, id.z, cube); 	//z na maxie
+	else if((id.y == _DensityMap_sizey / _Lod - 1)) 	FillCellY(id.x, id.y, id.z, cube); 	//y na maxie
+	else if((id.x == _DensityMap_sizex / _Lod - 1)) 	FillCellX(id.x, id.y, id.z, cube); 	//x na maxie
+	else												FillCell(id.x, id.y, id.z, cube);	//pozostałe
 
 //find whether corner is inside or outside the surface
     int flagIndex = 0;
@@ -121,7 +235,8 @@ void CSMain(uint3 id : SV_DispatchThreadID)
 
 //Do the triangulation
     int buffer_index = id.x + id.y * (_DensityMap_sizex / _Lod) + id.z * (_DensityMap_sizex / _Lod) * (_DensityMap_sizey / _Lod);
-    float3 normalsTextureSize = float3((_DensityMap_sizex - 1), (_DensityMap_sizey - 1), (_DensityMap_sizez - 1));
+    //float3 normalsTextureSize = float3((_DensityMap_sizex - 1), (_DensityMap_sizey - 1), (_DensityMap_sizez - 1));
+	float3 normalsTextureSize = float3((_DensityMap_sizex  ), (_DensityMap_sizey  ), (_DensityMap_sizez ));
     for(i = 0; i < 5; i++) //up to 5 triangles
     {
         if(_TriangleConnectionTable[flagIndex * 16 + 3 * i] >= 0)

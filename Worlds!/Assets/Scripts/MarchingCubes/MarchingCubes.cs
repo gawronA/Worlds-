@@ -30,7 +30,8 @@ namespace ProceduralTerrain
 			
 			ComputeBuffer m_cubeEdgeFlags, m_traingleConnectionTable;
 			ComputeBuffer m_meshBuffer;
-			ComputeBuffer m_densityBuffer, m_ChunkXdensityBuffer, m_ChunkYdensityBuffer, m_ChunkZdensityBuffer;
+			ComputeBuffer m_densityBuffer, m_ChunkXdensityBuffer, m_ChunkYdensityBuffer, m_ChunkZdensityBuffer,
+											m_ChunkXYdensityBuffer, m_ChunkYZdensityBuffer, m_ChunkXZdensityBuffer;
 
 			RenderTexture m_normalsTexture;
 
@@ -80,6 +81,9 @@ namespace ProceduralTerrain
 				m_ChunkXdensityBuffer = new ComputeBuffer(m_y_dim * m_z_dim, sizeof(float));
 				m_ChunkYdensityBuffer = new ComputeBuffer(m_x_dim * m_z_dim, sizeof(float));
 				m_ChunkZdensityBuffer = new ComputeBuffer(m_x_dim * m_y_dim, sizeof(float));
+				m_ChunkXYdensityBuffer = new ComputeBuffer(m_z_dim, sizeof(float));
+				m_ChunkYZdensityBuffer = new ComputeBuffer(m_x_dim, sizeof(float));
+				m_ChunkXZdensityBuffer = new ComputeBuffer(m_y_dim, sizeof(float));
 
 				//normals
 				m_normalsTexture = new RenderTexture(m_x_dim, m_y_dim, 0, RenderTextureFormat.ARGBHalf, RenderTextureReadWrite.Linear)
@@ -97,20 +101,15 @@ namespace ProceduralTerrain
 				InitNormals();
 			}
 
-			/// <summary>
-			/// Calculate with normals on borders
-			/// </summary>
-			/// <param name="densityMap"></param>
-			/// <param name="borderMapx"></param>
-			/// <param name="borderMapy"></param>
-			/// <param name="borderMapz"></param>
-			/// <returns></returns>
-			public Mesh ComputeMesh(float[] densityMap, float[] borderMapx, float[] borderMapy, float[] borderMapz)
+			public Mesh ComputeMesh(float[] densityMap, float[] borderMapx, float[] borderMapy, float[] borderMapz, float[] borderMapxy, float[] borderMapyz, float[] borderMapxz, float borderMapxyz)
 			{
 				m_densityBuffer.SetData(densityMap);
 				m_ChunkXdensityBuffer.SetData(borderMapx);
 				m_ChunkYdensityBuffer.SetData(borderMapy);
 				m_ChunkZdensityBuffer.SetData(borderMapz);
+				m_ChunkXYdensityBuffer.SetData(borderMapxy);
+				m_ChunkYZdensityBuffer.SetData(borderMapyz);
+				m_ChunkXZdensityBuffer.SetData(borderMapxz);
 
 				//Clear vertices
 				m_clearVerticesShader.SetBuffer(0, "_Vertices", m_meshBuffer);
@@ -129,6 +128,13 @@ namespace ProceduralTerrain
 				m_marchingCubesShader.SetTexture(0, "_Normals", m_normalsTexture);
 				m_marchingCubesShader.SetBuffer(0, "_Vertices", m_meshBuffer);
 				m_marchingCubesShader.SetBuffer(0, "_DensityMap", m_densityBuffer);
+				m_marchingCubesShader.SetBuffer(0, "_BorderMapx", m_ChunkXdensityBuffer);
+				m_marchingCubesShader.SetBuffer(0, "_BorderMapy", m_ChunkYdensityBuffer);
+				m_marchingCubesShader.SetBuffer(0, "_BorderMapz", m_ChunkZdensityBuffer);
+				m_marchingCubesShader.SetBuffer(0, "_BorderMapxy", m_ChunkXYdensityBuffer);
+				m_marchingCubesShader.SetBuffer(0, "_BorderMapyz", m_ChunkYZdensityBuffer);
+				m_marchingCubesShader.SetBuffer(0, "_BorderMapxz", m_ChunkXZdensityBuffer);
+				m_marchingCubesShader.SetFloat("_BorderMapxyz", borderMapxyz);
 				m_marchingCubesShader.Dispatch(0, m_x_lod_dim / (8 / m_lod), m_y_lod_dim / (8 / m_lod), m_z_lod_dim / (8 / m_lod)); //start the magic
 
 				//receive the verts
@@ -196,6 +202,9 @@ namespace ProceduralTerrain
 				m_ChunkXdensityBuffer.Release();
 				m_ChunkYdensityBuffer.Release();
 				m_ChunkZdensityBuffer.Release();
+				m_ChunkXYdensityBuffer.Release();
+				m_ChunkYZdensityBuffer.Release();
+				m_ChunkXZdensityBuffer.Release();
 			}
 		}
 	}

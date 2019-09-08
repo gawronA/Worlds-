@@ -1,38 +1,23 @@
 Base path: D:/Unity/Editor/Data
 Cmd: initializeCompiler
 Cmd: compileComputeKernel
-  api=4 insize=873 outsize=1225 ok=1
+  error: 2 plat 4 at MarchingCubes.compute(183): syntax error: unexpected token 'else'
+  error: 2 plat 4 at MarchingCubes.compute(184): syntax error: unexpected token 'else'
+  error: 2 plat 4 at MarchingCubes.compute(185): syntax error: unexpected token 'else'
+  error: 2 plat 4 at MarchingCubes.compute(186): syntax error: unexpected token 'else'
+  error: 2 plat 4 at MarchingCubes.compute(187): syntax error: unexpected token 'else'
+  api=4 insize=12020 outsize=0 ok=0
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: compileComputeKernel
-  error: 2 plat 4 at CalculateNormalsShader.compute(10): the product of the arguments of numthreads(16,16,16) must be less than or equal to 1024
-  api=4 insize=876 outsize=0 ok=0
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
+  api=4 insize=12997 outsize=14389 ok=1
 Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: initializeCompiler

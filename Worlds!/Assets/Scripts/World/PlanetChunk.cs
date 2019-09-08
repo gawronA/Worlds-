@@ -18,7 +18,7 @@ public unsafe class PlanetChunk : MonoBehaviour
 
 	//Density map
 	public float[] m_densityMap { get; private set; }
-	float[] m_xChunkMap, m_yChunkMap, m_zChunkMap;
+	private float[] m_xChunkMap, m_yChunkMap, m_zChunkMap, m_xyChunkMap, m_yzChunkMap, m_xzChunkMap, m_xyzChunkMap;
 
 	//Components
 	MeshFilter m_meshFilter;
@@ -77,7 +77,7 @@ public unsafe class PlanetChunk : MonoBehaviour
 			m_calculateNormalsShader = m_CalculateNormalsShader,
 			m_recalculateNormals = sharpEdges
 		};
-		m_mc.Initalize(m_res, m_res, m_res, m_scale, 1);
+		m_mc.Initalize(m_res, m_res, m_res, m_scale, 0);
 	}
 
 	public void SetDensityMap(float[] map)
@@ -90,16 +90,23 @@ public unsafe class PlanetChunk : MonoBehaviour
 		float[] borderMapx = new float[m_res2];
 		float[] borderMapy = new float[m_res2];
 		float[] borderMapz = new float[m_res2];
+		float[] borderMapxy = new float[m_res];
+		float[] borderMapyz = new float[m_res];
+		float[] borderMapxz = new float[m_res];
+		float	borderMapxyz = m_xyzChunkMap[0];
 		for(int b = 0, i = 0; b < m_res; b++)
 		{
 			for(int a = 0; a < m_res; a++, i++)
 			{
-				borderMapx[i] = m_xChunkMap[1 + a * m_res + b * m_res2];
-				borderMapy[i] = m_yChunkMap[m_res + a + b * m_res2];
-				borderMapz[i] = m_zChunkMap[m_res2 + a + b * m_res];
+				borderMapx[i] = m_xChunkMap[/*1 + */a * m_res + b * m_res2];
+				borderMapy[i] = m_yChunkMap[/*m_res + */a + b * m_res2];
+				borderMapz[i] = m_zChunkMap[/*m_res2 + */a + b * m_res];
 			}
+			borderMapxy[b] = m_xyChunkMap[b * m_res2];
+			borderMapyz[b] = m_yzChunkMap[b];
+			borderMapxz[b] = m_xzChunkMap[b * m_res];
 		}
-		Mesh mesh = m_mc.ComputeMesh(m_densityMap, borderMapx, borderMapy, borderMapz);
+		Mesh mesh = m_mc.ComputeMesh(m_densityMap, borderMapx, borderMapy, borderMapz, borderMapxy, borderMapyz, borderMapxz, borderMapxyz);
 		mesh.name = name + "_" + m_id.ToString();
 
 		m_meshFilter.mesh.Clear();
@@ -121,6 +128,26 @@ public unsafe class PlanetChunk : MonoBehaviour
 	public void AssignZChunkMap(float[] z_chunkMap)
 	{
 		m_zChunkMap = z_chunkMap;
+	}
+
+	public void AssignXYChunkMap(float[] xy_chunkMap)
+	{
+		m_xyChunkMap = xy_chunkMap;
+	}
+
+	public void AssignYZChunkMap(float[] yz_chunkMap)
+	{
+		m_yzChunkMap = yz_chunkMap;
+	}
+
+	public void AssignXZChunkMap(float[] xz_chunkMap)
+	{
+		m_xzChunkMap = xz_chunkMap;
+	}
+
+	public void AssignXYZChunkMap(float[] xyz_chunkMap)
+	{
+		m_xyzChunkMap = xyz_chunkMap;
 	}
 
 	void DrawNormals()

@@ -37,6 +37,14 @@ public class Planet : MonoBehaviour
 			{
 				for(int x = 0; x < chunkLength; x++, i++)
 				{
+					if(x != chunkLength - 1 && y != chunkLength - 1 && z != chunkLength - 1) m_chunks[i].AssignXYZChunkMap(m_chunks[i + 1 + chunkLength + chunkLength2].m_densityMap);
+					else m_chunks[i].AssignXYZChunkMap(dummyMap);
+					if(x != chunkLength - 1 && z != chunkLength - 1) m_chunks[i].AssignXZChunkMap(m_chunks[i + 1 + chunkLength2].m_densityMap);
+					else m_chunks[i].AssignXZChunkMap(dummyMap);
+					if(y != chunkLength - 1 && z != chunkLength - 1) m_chunks[i].AssignYZChunkMap(m_chunks[i + chunkLength + chunkLength2].m_densityMap);
+					else m_chunks[i].AssignYZChunkMap(dummyMap);
+					if(x != chunkLength - 1 && y != chunkLength - 1) m_chunks[i].AssignXYChunkMap(m_chunks[i + 1 + chunkLength].m_densityMap);
+					else m_chunks[i].AssignXYChunkMap(dummyMap);
 					if(x != chunkLength - 1) m_chunks[i].AssignXChunkMap(m_chunks[i + 1].m_densityMap);
 					else m_chunks[i].AssignXChunkMap(dummyMap);
 					if(y != chunkLength - 1) m_chunks[i].AssignYChunkMap(m_chunks[i + chunkLength].m_densityMap);
