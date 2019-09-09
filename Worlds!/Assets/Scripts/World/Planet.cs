@@ -11,6 +11,7 @@ public class Planet : MonoBehaviour
 	int m_chunkRes;
 	List<GameObject> m_chunkObjs;
 	List<PlanetChunk> m_chunks;
+	
 
 	public void Initalize(int chunkLength, int chunkRes)
 	{

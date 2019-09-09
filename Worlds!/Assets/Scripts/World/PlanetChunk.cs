@@ -87,25 +87,39 @@ public unsafe class PlanetChunk : MonoBehaviour
 
 	public void Refresh()
 	{
-		float[] borderMapx = new float[m_res2];
-		float[] borderMapy = new float[m_res2];
-		float[] borderMapz = new float[m_res2];
-		float[] borderMapxy = new float[m_res];
-		float[] borderMapyz = new float[m_res];
-		float[] borderMapxz = new float[m_res];
-		float	borderMapxyz = m_xyzChunkMap[0];
+		float[] borderMapx = new float[2 * m_res2];
+		float[] borderMapy = new float[2 * m_res2];
+		float[] borderMapz = new float[2 * m_res2];
+		float[] borderMapxy = new float[3 * m_res];
+		float[] borderMapyz = new float[3 * m_res];
+		float[] borderMapxz = new float[3 * m_res];
+		float[] borderMapxyz = new float[4];
 		for(int b = 0, i = 0; b < m_res; b++)
 		{
 			for(int a = 0; a < m_res; a++, i++)
 			{
-				borderMapx[i] = m_xChunkMap[/*1 + */a * m_res + b * m_res2];
-				borderMapy[i] = m_yChunkMap[/*m_res + */a + b * m_res2];
-				borderMapz[i] = m_zChunkMap[/*m_res2 + */a + b * m_res];
+				borderMapx[i] = m_xChunkMap[a * m_res + b * m_res2];
+				borderMapx[i + m_res2] = m_xChunkMap[1 + a * m_res + b * m_res2];
+				borderMapy[i] = m_yChunkMap[a + b * m_res2];
+				borderMapy[i + m_res2] = m_yChunkMap[m_res + a + b * m_res2];
+				borderMapz[i] = m_zChunkMap[a + b * m_res];
+				borderMapz[i + m_res2] = m_zChunkMap[m_res2 + a + b * m_res];
 			}
 			borderMapxy[b] = m_xyChunkMap[b * m_res2];
+			borderMapxy[b + m_res] = m_xyChunkMap[1 + b * m_res2]; //kopia w xsie
+			borderMapxy[b + 2 * m_res] = m_xyChunkMap[m_res + b * m_res2]; //kopia w y
 			borderMapyz[b] = m_yzChunkMap[b];
+			borderMapyz[b + m_res] = m_yzChunkMap[m_res + b]; //kopia w y
+			borderMapyz[b + 2 * m_res] = m_yzChunkMap[m_res2 + b]; //kopia w z
 			borderMapxz[b] = m_xzChunkMap[b * m_res];
+			borderMapxz[b + m_res] = m_xzChunkMap[1 + b * m_res]; //kopia w x
+			borderMapxz[b + 2 * m_res] = m_xzChunkMap[m_res2 + b * m_res]; //kopia w z
 		}
+		borderMapxyz[0] = m_xyzChunkMap[0];
+		borderMapxyz[1] = m_xyzChunkMap[1];
+		borderMapxyz[2] = m_xyzChunkMap[m_res];
+		borderMapxyz[3] = m_xyzChunkMap[m_res2];
+
 		Mesh mesh = m_mc.ComputeMesh(m_densityMap, borderMapx, borderMapy, borderMapz, borderMapxy, borderMapyz, borderMapxz, borderMapxyz);
 		mesh.name = name + "_" + m_id.ToString();
 

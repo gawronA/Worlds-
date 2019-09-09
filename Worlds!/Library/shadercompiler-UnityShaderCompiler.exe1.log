@@ -1,12 +1,7 @@
 Base path: D:/Unity/Editor/Data
 Cmd: initializeCompiler
 Cmd: compileComputeKernel
-  api=4 insize=9744 outsize=12149 ok=1
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
-Cmd: initializeCompiler
+  api=4 insize=13008 outsize=14481 ok=1
 Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: initializeCompiler
@@ -28,14 +23,41 @@ Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: compileComputeKernel
-  error: 2 plat 4 at MarchingCubes.compute(122): syntax error: unexpected token ','
-  error: 2 plat 4 at MarchingCubes.compute(125): undeclared identifier 'cell'
-  api=4 insize=11985 outsize=0 ok=0
+  error: 1 plat 4 at CalculateNormalsShader.compute(24): use of potentially uninitialized variable (value) use of potentially uninitialized variable (deltax) use of potentially uninitialized variable (deltay) use of potentially uninitialized variable (deltaz)
+  api=4 insize=3219 outsize=4165 ok=1
 Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: compileComputeKernel
+  error: 1 plat 4 at CalculateNormalsShader.compute(23): use of potentially uninitialized variable (value) use of potentially uninitialized variable (deltax) use of potentially uninitialized variable (deltay) use of potentially uninitialized variable (deltaz)
+  api=4 insize=3199 outsize=4133 ok=1
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: compileComputeKernel
+  error: 1 plat 4 at CalculateNormalsShader.compute(23): use of potentially uninitialized variable (value) use of potentially uninitialized variable (deltax) use of potentially uninitialized variable (deltay) use of potentially uninitialized variable (deltaz)
+  error: 1 plat 4 at CalculateNormalsShader.compute(31): use of potentially uninitialized variable (value) use of potentially uninitialized variable (deltax) use of potentially uninitialized variable (deltay) use of potentially uninitialized variable (deltaz)
+  error: 1 plat 4 at CalculateNormalsShader.compute(39): use of potentially uninitialized variable (value) use of potentially uninitialized variable (deltax) use of potentially uninitialized variable (deltay) use of potentially uninitialized variable (deltaz)
+  error: 1 plat 4 at CalculateNormalsShader.compute(47): use of potentially uninitialized variable (value) use of potentially uninitialized variable (deltax) use of potentially uninitialized variable (deltay) use of potentially uninitialized variable (deltaz)
+  api=4 insize=3577 outsize=3965 ok=1
 Cmd: initializeCompiler
 Cmd: initializeCompiler
 Cmd: initializeCompiler

@@ -7,27 +7,88 @@ StructuredBuffer<float> _DensityMap;
 StructuredBuffer<float> _BorderMapx;
 StructuredBuffer<float> _BorderMapy;
 StructuredBuffer<float> _BorderMapz;
+StructuredBuffer<float> _BorderMapxy, _BorderMapyz, _BorderMapxz, _BorderMapxyz;
 
 RWTexture3D<float3> _Normals;
 
-[numthreads(8, 8, 8)]
+[numthreads(9, 9, 9)]
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
-
-    int idx = id.x + id.y * _x + id.z * _x * _y;
+	if(id.x > _x || id.y > _y || id.z > _z) return;
 	float dx, dy, dz;
-    float value = _DensityMap[idx];
+	float value;
 	float deltax, deltay, deltaz;
 	
-	//if (id.x == _x - 1) deltax = -1.0f;
-	if(id.x == _x - 1) deltax = _BorderMapx[id.y + id.z * _y];
-	else deltax = _DensityMap[(id.x + 1) + id.y * _x + id.z * _x * _y];
-	//if (id.y == _y - 1) deltay = -1.0f;
-	if(id.y == _y - 1) deltay = _BorderMapy[id.x + id.z * _x];
-	else deltay = _DensityMap[id.x + (id.y + 1) * _x + id.z * _x * _y];
-	//if (id.z == _z - 1) deltaz = -1.0f;
-	if(id.z == _z - 1) deltaz = _BorderMapz[id.x + id.y * _x];
-	else deltaz = _DensityMap[id.x + id.y * _x + (id.z + 1) * _x * _y];
+	
+	if(id.x == _x && id.y == _y && id.z == _z)
+	{
+		value = _BorderMapxyz[0];
+		deltax = _BorderMapxyz[1];
+		deltay = _BorderMapxyz[2];
+		deltaz = _BorderMapxyz[3];
+	}
+	else if(id.x == _x && id.z == _z)
+	{
+		value = _BorderMapxz[id.y];
+		deltax = _BorderMapxz[_y + id.y];
+		if(id.y == _y - 1) deltay = _BorderMapxyz[0];
+		else deltay = _BorderMapxz[1 + id.y];
+		deltaz = _BorderMapxz[2 * _y + id.y];
+	}
+	else if(id.y == _y && id.z == _z)
+	{
+		value = _BorderMapyz[id.x];
+		if(id.x == _x - 1) deltax = _BorderMapxyz[0];
+		else deltax = _BorderMapyz[1 + id.x];
+		deltay = _BorderMapyz[_x + id.x];
+		deltaz = _BorderMapyz[2 * _x + id.x];
+	}
+	else if(id.x == _x && id.y == _y)
+	{
+		value = _BorderMapxy[id.z];
+		deltax = _BorderMapxy[_z + id.z];
+		deltay = _BorderMapxy[2 * _z + id.z];
+		if(id.z == _z - 1) deltaz = _BorderMapxyz[0];
+		else deltaz = _BorderMapxy[1 + id.z];
+	}
+	else if(id.z == _z)
+	{
+		value = _BorderMapz[id.x + id.y * _x];
+		if(id.x == _x - 1) deltax = _BorderMapxz[id.y];
+		else deltax = _BorderMapz[1 + id.x + id.y * _x];
+		if(id.y == _y - 1) deltay = _BorderMapyz[id.x];
+		else deltay = _BorderMapz[_x + id.x + id.y * _x];
+		deltaz = _BorderMapz[_x * _y + id.x + id.y * _x];
+	}
+	else if(id.y == _y)
+	{
+		value = _BorderMapy[id.x + id.z * _x];
+		if(id.x == _x - 1) deltax = _BorderMapxy[id.z];
+		else deltax = _BorderMapy[1 + id.x + id.z * _x];
+		deltay = _BorderMapy[_x * _z + id.x + id.z * _x];
+		if(id.z == _z - 1) deltaz = _BorderMapyz[id.x];
+		else deltaz = _BorderMapy[_x + id.x + id.z * _x];
+	}
+	else if(id.x == _x)
+	{
+		value = _BorderMapx[id.y + id.z * _y];
+		deltax = _BorderMapx[_y * _z + id.y + id.z * _y];
+		if(id.y == _y - 1) deltay = _BorderMapxy[id.z];
+		else deltay = _BorderMapx[1 + id.y + id.z * _y];
+		if(id.z == _z - 1) deltaz = _BorderMapxz[id.y];
+		else deltaz = _BorderMapx[_y + id.y + id.z * _y];
+	}
+	else 
+	{
+		value = _DensityMap[id.x + id.y * _x + id.z * _x * _y];
+		if(id.x == _x - 1) deltax = _BorderMapx[id.y + id.z * _y];
+		else deltax = _DensityMap[(id.x + 1) + id.y * _x + id.z * _x * _y];
+		if(id.y == _y - 1) deltay = _BorderMapy[id.x + id.z * _x];
+		else deltay = _DensityMap[id.x + (id.y + 1) * _x + id.z * _x * _y];
+		if(id.z == _z - 1) deltaz = _BorderMapz[id.x + id.y * _x];
+		else deltaz = _DensityMap[id.x + id.y * _x + (id.z + 1) * _x * _y];
+	}
+	
 	
 	dx = (value - deltax);
 	dy = (value - deltay);

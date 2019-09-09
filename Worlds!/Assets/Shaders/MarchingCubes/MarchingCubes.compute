@@ -235,8 +235,7 @@ void CSMain(uint3 id : SV_DispatchThreadID)
 
 //Do the triangulation
     int buffer_index = id.x + id.y * (_DensityMap_sizex / _Lod) + id.z * (_DensityMap_sizex / _Lod) * (_DensityMap_sizey / _Lod);
-    //float3 normalsTextureSize = float3((_DensityMap_sizex - 1), (_DensityMap_sizey - 1), (_DensityMap_sizez - 1));
-	float3 normalsTextureSize = float3((_DensityMap_sizex  ), (_DensityMap_sizey  ), (_DensityMap_sizez ));
+	float3 normalsTextureSize = float3(_DensityMap_sizex, _DensityMap_sizey, _DensityMap_sizez);
     for(i = 0; i < 5; i++) //up to 5 triangles
     {
         if(_TriangleConnectionTable[flagIndex * 16 + 3 * i] >= 0)
