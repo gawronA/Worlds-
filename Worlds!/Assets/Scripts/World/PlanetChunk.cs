@@ -1,53 +1,70 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Collections;
 using ProceduralTerrain.MarchingCubes;
+
 
 public unsafe class PlanetChunk : MonoBehaviour
 {
-	Planet m_planet;
+	
 	public bool showNormals = false;
-	public bool refresh = false;
-	public bool lod1 = false;
+	public bool refresh = true;
+    public bool continousRefresh = false;
 	
 	//chunk info
 	int m_id;
 	int m_res;
 	int m_res2;
 	float m_scale;
+    Vector3 m_center;
 
-	//Density map
-	public float[] m_densityMap { get; private set; }
-	private float[] m_xChunkMap, m_yChunkMap, m_zChunkMap, m_xyChunkMap, m_yzChunkMap, m_xzChunkMap, m_xyzChunkMap;
+    //Environment
+    private Planet m_planet;
+    private PlanetChunk[] m_neighbourChunks;
+    private Transform m_player;
+
+    //Density map
+    public float[] m_densityMap { get; private set; }
+    
 
 	//Components
 	MeshFilter m_meshFilter;
 	MeshCollider m_meshCollider;
 
-	//Mesh generation
-	MarchingCubes m_mc;
+    //Mesh generation
+    public float m_lod1Distance = 100f, m_lod2Distance = 500f, m_lod3Distance = 1000f;
+    private MarchingCubes m_mc;
+    private float[] m_borderMapx, m_borderMapy, m_borderMapz, m_borderMapxy, m_borderMapyz, m_borderMapxz, m_borderMapxyz;
 	public ComputeShader m_MarchingCubesShader;
 	public ComputeShader m_ClearVerticesShader;
 	public ComputeShader m_CalculateNormalsShader;
+    public Material m_DrawMeshShader;
+    private int m_lod;
+    //private bool m_needRefresh;
 
-	void Start ()
+    //Jobs
+    //NativeArray<Vector3> n_meshVertices;
+    //NativeArray<Vector3> n_mesh
+    private void Start()
 	{
-		
-	}
-	
-	void Update ()
+        m_player = GameObject.FindGameObjectWithTag("Player").transform;
+    }
+
+    private void Update()
 	{
-		if(refresh)
+		/*if(refresh || continousRefresh)
 		{
-			//refresh = false;
-			Refresh();
-		}
-		if(lod1)
-		{
-			m_mc.Release();
-			m_mc.Initalize(m_res, m_res, m_res, m_scale, 1);
-			Refresh();
-		}
+			refresh = false;
+			RefreshMeshAndCollider(lod);
+        }*/
+
+        float playerDistance = Vector3.Distance(m_player.position, m_center);
+        if(playerDistance > m_lod3Distance && m_lod != 3) { RefreshMesh(3); Debug.Log("LOD" + m_lod.ToString()); }
+        else if(playerDistance <= m_lod3Distance && playerDistance > m_lod2Distance && m_lod != 2) { RefreshMesh(2); Debug.Log("LOD" + m_lod.ToString()); }
+        else if(playerDistance <= m_lod2Distance && playerDistance > m_lod1Distance && m_lod != 1) { RefreshMesh(1); Debug.Log("LOD" + m_lod.ToString()); }
+        else if(playerDistance <= m_lod1Distance && m_lod != 0) { RefreshMesh(0); Debug.Log("LOD" + m_lod.ToString()); }
+        
 	}
 
 	private void OnValidate()
@@ -66,103 +83,152 @@ public unsafe class PlanetChunk : MonoBehaviour
 		m_res = res;
 		m_res2 = m_res * m_res;
 		m_scale = scale;
+        m_center = transform.TransformPoint(new Vector3((float)m_res / 2, (float)m_res / 2, (float)m_res / 2));
+
+        m_neighbourChunks = new PlanetChunk[27];
 
 		m_meshFilter = GetComponent<MeshFilter>();
 		m_meshCollider = GetComponent<MeshCollider>();
 
-		m_mc = new MarchingCubes
-		{
-			m_marchingCubesShader = m_MarchingCubesShader,
-			m_clearVerticesShader = m_ClearVerticesShader,
-			m_calculateNormalsShader = m_CalculateNormalsShader,
+        m_mc = new MarchingCubes
+        {
+            m_marchingCubesShader = m_MarchingCubesShader,
+            m_clearVerticesShader = m_ClearVerticesShader,
+            m_calculateNormalsShader = m_CalculateNormalsShader,
+            m_drawMesh = m_DrawMeshShader,
 			m_recalculateNormals = sharpEdges
 		};
-		m_mc.Initalize(m_res, m_res, m_res, m_scale, 0);
-	}
+		//m_mc.Initalize(m_res, m_res, m_res, m_scale, m_lod);
+
+        m_borderMapx = new float[2 * m_res2];
+        m_borderMapy = new float[2 * m_res2];
+        m_borderMapz = new float[2 * m_res2];
+        m_borderMapxy = new float[3 * m_res];
+        m_borderMapyz = new float[3 * m_res];
+        m_borderMapxz = new float[3 * m_res];
+        m_borderMapxyz = new float[4];
+
+        //RefreshCollider();
+    }
 
 	public void SetDensityMap(float[] map)
 	{
 		m_densityMap = map;
 	}
 
-	public void Refresh()
+	public void RefreshMeshAndCollider(int lod)
 	{
-		float[] borderMapx = new float[2 * m_res2];
-		float[] borderMapy = new float[2 * m_res2];
-		float[] borderMapz = new float[2 * m_res2];
-		float[] borderMapxy = new float[3 * m_res];
-		float[] borderMapyz = new float[3 * m_res];
-		float[] borderMapxz = new float[3 * m_res];
-		float[] borderMapxyz = new float[4];
-		for(int b = 0, i = 0; b < m_res; b++)
-		{
-			for(int a = 0; a < m_res; a++, i++)
-			{
-				borderMapx[i] = m_xChunkMap[a * m_res + b * m_res2];
-				borderMapx[i + m_res2] = m_xChunkMap[1 + a * m_res + b * m_res2];
-				borderMapy[i] = m_yChunkMap[a + b * m_res2];
-				borderMapy[i + m_res2] = m_yChunkMap[m_res + a + b * m_res2];
-				borderMapz[i] = m_zChunkMap[a + b * m_res];
-				borderMapz[i + m_res2] = m_zChunkMap[m_res2 + a + b * m_res];
-			}
-			borderMapxy[b] = m_xyChunkMap[b * m_res2];
-			borderMapxy[b + m_res] = m_xyChunkMap[1 + b * m_res2]; //kopia w xsie
-			borderMapxy[b + 2 * m_res] = m_xyChunkMap[m_res + b * m_res2]; //kopia w y
-			borderMapyz[b] = m_yzChunkMap[b];
-			borderMapyz[b + m_res] = m_yzChunkMap[m_res + b]; //kopia w y
-			borderMapyz[b + 2 * m_res] = m_yzChunkMap[m_res2 + b]; //kopia w z
-			borderMapxz[b] = m_xzChunkMap[b * m_res];
-			borderMapxz[b + m_res] = m_xzChunkMap[1 + b * m_res]; //kopia w x
-			borderMapxz[b + 2 * m_res] = m_xzChunkMap[m_res2 + b * m_res]; //kopia w z
-		}
-		borderMapxyz[0] = m_xyzChunkMap[0];
-		borderMapxyz[1] = m_xyzChunkMap[1];
-		borderMapxyz[2] = m_xyzChunkMap[m_res];
-		borderMapxyz[3] = m_xyzChunkMap[m_res2];
+        Mesh mesh;
+        CopyBorderMaps();
 
-		Mesh mesh = m_mc.ComputeMesh(m_densityMap, borderMapx, borderMapy, borderMapz, borderMapxy, borderMapyz, borderMapxz, borderMapxyz);
-		mesh.name = name + "_" + m_id.ToString();
+        if(m_lod != lod)
+        {
+            m_lod = lod;
+            m_mc.Release();
+            m_mc.Initalize(m_res, m_res, m_res, m_scale, m_lod);
+        }
 
-		m_meshFilter.mesh.Clear();
-		m_meshFilter.mesh = mesh;
+        mesh = m_mc.ComputeMesh(m_densityMap, m_borderMapx, m_borderMapy, m_borderMapz, m_borderMapxy, m_borderMapyz, m_borderMapxz, m_borderMapxyz);
+        mesh.name = name + "_" + m_id.ToString() + "_" + m_lod.ToString();
+        m_meshFilter.mesh.Clear();
+        m_meshFilter.mesh = mesh;
 
-		m_meshCollider.sharedMesh = mesh;
+        if(lod != 0)
+        {
+            m_lod = 0;
+            m_mc.Release();
+            m_mc.Initalize(m_res, m_res, m_res, m_scale, 0);
+            mesh = m_mc.ComputeMesh(m_densityMap, m_borderMapx, m_borderMapy, m_borderMapz, m_borderMapxy, m_borderMapyz, m_borderMapxz, m_borderMapxyz);
+            mesh.name = name + "_" + m_id.ToString() + "_" + m_lod.ToString();
+        }
+        m_meshCollider.sharedMesh = mesh;
 	}
 
-	public void AssignXChunkMap(float[] x_chunkMap)
-	{
-		m_xChunkMap = x_chunkMap;
-	}
-	
-	public void AssignYChunkMap(float[] y_chunkMap)
-	{
-		m_yChunkMap = y_chunkMap;
-	}
+    public void RefreshMesh(int lod)
+    {
+        Mesh mesh;
+        CopyBorderMaps();
 
-	public void AssignZChunkMap(float[] z_chunkMap)
-	{
-		m_zChunkMap = z_chunkMap;
-	}
+        if(m_lod != lod)
+        {
+            m_lod = lod;
+            m_mc.Release();
+            m_mc.Initalize(m_res, m_res, m_res, m_scale, m_lod);
+        }
 
-	public void AssignXYChunkMap(float[] xy_chunkMap)
-	{
-		m_xyChunkMap = xy_chunkMap;
-	}
+        mesh = m_mc.ComputeMesh(m_densityMap, m_borderMapx, m_borderMapy, m_borderMapz, m_borderMapxy, m_borderMapyz, m_borderMapxz, m_borderMapxyz);
+        mesh.name = name + "_" + m_id.ToString() + "_" + m_lod.ToString();
+        m_meshFilter.mesh.Clear();
+        m_meshFilter.mesh = mesh;
+    }
 
-	public void AssignYZChunkMap(float[] yz_chunkMap)
-	{
-		m_yzChunkMap = yz_chunkMap;
-	}
+    public void RefreshCollider()
+    {
+        Mesh mesh;
+        CopyBorderMaps();
 
-	public void AssignXZChunkMap(float[] xz_chunkMap)
-	{
-		m_xzChunkMap = xz_chunkMap;
-	}
+        m_lod = 0;
+        //m_mc.Release();
+        m_mc.Initalize(m_res, m_res, m_res, m_scale, 0);
+        mesh = m_mc.ComputeMesh(m_densityMap, m_borderMapx, m_borderMapy, m_borderMapz, m_borderMapxy, m_borderMapyz, m_borderMapxz, m_borderMapxyz);
+        mesh.name = name + "_" + m_id.ToString() + "_" + m_lod.ToString();
 
-	public void AssignXYZChunkMap(float[] xyz_chunkMap)
-	{
-		m_xyzChunkMap = xyz_chunkMap;
-	}
+        m_meshCollider.sharedMesh = mesh;
+    }
+    private void CopyBorderMaps()
+    {
+        for(int b = 0, i = 0; b < m_res; b++)
+        {
+            for(int a = 0; a < m_res; a++, i++)
+            {
+                if(m_neighbourChunks[14] != null)
+                {
+                    m_borderMapx[i] = m_neighbourChunks[14].m_densityMap[a * m_res + b * m_res2];
+                    m_borderMapx[i + m_res2] = m_neighbourChunks[14].m_densityMap[1 + a * m_res + b * m_res2];
+                }
+                if(m_neighbourChunks[22] != null)
+                {
+                    m_borderMapy[i] = m_neighbourChunks[22].m_densityMap[a + b * m_res2];
+                    m_borderMapy[i + m_res2] = m_neighbourChunks[22].m_densityMap[m_res + a + b * m_res2];
+                }
+                if(m_neighbourChunks[16] != null)
+                {
+                    m_borderMapz[i] = m_neighbourChunks[16].m_densityMap[a + b * m_res];
+                    m_borderMapz[i + m_res2] = m_neighbourChunks[16].m_densityMap[m_res2 + a + b * m_res];
+                }
+            }
+            if(m_neighbourChunks[23] != null)
+            {
+                m_borderMapxy[b] = m_neighbourChunks[23].m_densityMap[b * m_res2];
+                m_borderMapxy[b + m_res] = m_neighbourChunks[23].m_densityMap[1 + b * m_res2]; //kopia w xsie
+                m_borderMapxy[b + 2 * m_res] = m_neighbourChunks[23].m_densityMap[m_res + b * m_res2]; //kopia w y
+            }
+            if(m_neighbourChunks[25] != null)
+            {
+                m_borderMapyz[b] = m_neighbourChunks[25].m_densityMap[b];
+                m_borderMapyz[b + m_res] = m_neighbourChunks[25].m_densityMap[m_res + b]; //kopia w y
+                m_borderMapyz[b + 2 * m_res] = m_neighbourChunks[25].m_densityMap[m_res2 + b]; //kopia w z
+            }
+            if(m_neighbourChunks[17] != null)
+            {
+                m_borderMapxz[b] = m_neighbourChunks[17].m_densityMap[b * m_res];
+                m_borderMapxz[b + m_res] = m_neighbourChunks[17].m_densityMap[1 + b * m_res]; //kopia w x
+                m_borderMapxz[b + 2 * m_res] = m_neighbourChunks[17].m_densityMap[m_res2 + b * m_res]; //kopia w z
+            }
+        }
+        if(m_neighbourChunks[26] != null)
+        {
+            m_borderMapxyz[0] = m_neighbourChunks[26].m_densityMap[0];
+            m_borderMapxyz[1] = m_neighbourChunks[26].m_densityMap[1];
+            m_borderMapxyz[2] = m_neighbourChunks[26].m_densityMap[m_res];
+            m_borderMapxyz[3] = m_neighbourChunks[26].m_densityMap[m_res2];
+        }
+    }
+
+    public void AssignNeighbour(PlanetChunk chunk, int side)
+    {
+        m_neighbourChunks[side] = chunk;
+    }
 
 	void DrawNormals()
 	{

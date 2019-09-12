@@ -13,6 +13,7 @@ namespace ProceduralTerrain
 			public ComputeShader m_marchingCubesShader;
 			public ComputeShader m_clearVerticesShader;
 			public ComputeShader m_calculateNormalsShader;
+            public Material m_drawMesh;
 			public float m_offset = 0.0f;
 			public bool m_recalculateNormals = false;
 
@@ -54,6 +55,8 @@ namespace ProceduralTerrain
 				if(m_marchingCubesShader == null) throw new System.ArgumentException("Missing MarchingCubesShader");
 				if(m_clearVerticesShader == null) throw new System.ArgumentException("Missing ClearVerticesShader");
 				if(m_calculateNormalsShader == null) throw new System.ArgumentException("Missing CalculateNormalsShader");
+
+                //CameraPostRender.AddEvent(Camera.main, DrawMesh);
 
 				m_x_dim = x_dim;
 				m_y_dim = y_dim;
@@ -144,8 +147,8 @@ namespace ProceduralTerrain
 				m_marchingCubesShader.SetFloat("_BorderMapxyz", borderMapxyz[0]);
 				m_marchingCubesShader.Dispatch(0, m_x_lod_dim / (8 / m_lod), m_y_lod_dim / (8 / m_lod), m_z_lod_dim / (8 / m_lod)); //start the magic
 
-				//receive the verts
-				Vertex[] receivedData = new Vertex[m_maxVertices];
+                //receive the verts
+                Vertex[] receivedData = new Vertex[m_maxVertices];
 				List<Vector3> vertices = new List<Vector3>();
 				List<Vector3> normals = new List<Vector3>();
 				List<int> triangles = new List<int>();
@@ -166,7 +169,8 @@ namespace ProceduralTerrain
 				mesh.SetNormals(normals);
 				mesh.SetTriangles(triangles, 0);
 
-				return mesh;
+                return mesh;
+                //return new Mesh();
 			}
 
 			private void InitMC()
@@ -199,6 +203,13 @@ namespace ProceduralTerrain
 				m_calculateNormalsShader.SetInt("_Lod", m_lod);
 				m_calculateNormalsShader.SetTexture(0, "_Normals", m_normalsTexture);
 			}
+
+            /*public void DrawMesh(Camera camera)
+            {
+                m_drawMesh.SetBuffer("_MeshBuffer", m_meshBuffer);
+                m_drawMesh.SetPass(0);
+                Graphics.DrawProceduralNow(MeshTopology.Triangles, m_maxVertices);
+            }*/
 
 			public void Release()
 			{

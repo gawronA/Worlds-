@@ -86,8 +86,8 @@ public class PlanetGenerator : MonoBehaviour
 					planet.AddChunk(chunkObj);
 
 					PlanetChunk chunk = chunkObj.GetComponent<PlanetChunk>();
-					chunk.Initalize(id, m_xyzResolution, m_scale, m_sharpEdges);
-
+                    chunk.Initalize(id, m_xyzResolution, m_scale, m_sharpEdges);
+					
 					float[] densityMap = new float[m_xyzResolution * m_xyzResolution * m_xyzResolution];
 					for(int z = 0; z < m_xyzResolution; z++)
 					{
@@ -101,7 +101,7 @@ public class PlanetGenerator : MonoBehaviour
 						}
 					}
 					chunk.SetDensityMap(densityMap);
-				}
+                }
 			}
 		}
 		planet.AssignChunkNeighboursAndRefresh();

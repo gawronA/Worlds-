@@ -31,30 +31,80 @@ public class Planet : MonoBehaviour
 	{
 		int chunkLength = m_chunkLength;
 		int chunkLength2 = m_chunkLength * m_chunkLength;
-		float[] dummyMap = new float[m_chunkRes * m_chunkRes * m_chunkRes];
 		for(int z = 0, i = 0; z < chunkLength; z++)
 		{
 			for(int y = 0; y < chunkLength; y++)
 			{
 				for(int x = 0; x < chunkLength; x++, i++)
 				{
-					if(x != chunkLength - 1 && y != chunkLength - 1 && z != chunkLength - 1) m_chunks[i].AssignXYZChunkMap(m_chunks[i + 1 + chunkLength + chunkLength2].m_densityMap);
-					else m_chunks[i].AssignXYZChunkMap(dummyMap);
-					if(x != chunkLength - 1 && z != chunkLength - 1) m_chunks[i].AssignXZChunkMap(m_chunks[i + 1 + chunkLength2].m_densityMap);
-					else m_chunks[i].AssignXZChunkMap(dummyMap);
-					if(y != chunkLength - 1 && z != chunkLength - 1) m_chunks[i].AssignYZChunkMap(m_chunks[i + chunkLength + chunkLength2].m_densityMap);
-					else m_chunks[i].AssignYZChunkMap(dummyMap);
-					if(x != chunkLength - 1 && y != chunkLength - 1) m_chunks[i].AssignXYChunkMap(m_chunks[i + 1 + chunkLength].m_densityMap);
-					else m_chunks[i].AssignXYChunkMap(dummyMap);
-					if(x != chunkLength - 1) m_chunks[i].AssignXChunkMap(m_chunks[i + 1].m_densityMap);
-					else m_chunks[i].AssignXChunkMap(dummyMap);
-					if(y != chunkLength - 1) m_chunks[i].AssignYChunkMap(m_chunks[i + chunkLength].m_densityMap);
-					else m_chunks[i].AssignYChunkMap(dummyMap);
-					if(z != chunkLength - 1) m_chunks[i].AssignZChunkMap(m_chunks[i + chunkLength2].m_densityMap);
-					else m_chunks[i].AssignZChunkMap(dummyMap);
-					m_chunks[i].Refresh();
+					if(x != chunkLength - 1 && y != chunkLength - 1 && z != chunkLength - 1) m_chunks[i].AssignNeighbour(m_chunks[i + 1 + chunkLength + chunkLength2], 26); //+x+y+z                                                                                     
+                    if(y != chunkLength - 1 && z != chunkLength - 1) m_chunks[i].AssignNeighbour(m_chunks[i + chunkLength + chunkLength2], 25);                                
+                    if(x - 1 >= 0 && y != chunkLength - 1 && z != chunkLength - 1) m_chunks[i].AssignNeighbour(m_chunks[i - 1 + chunkLength + chunkLength2], 24);
+
+                    if(x != chunkLength - 1 && y != chunkLength - 1) m_chunks[i].AssignNeighbour(m_chunks[i + 1 + chunkLength], 23);
+                    if(y != chunkLength - 1) m_chunks[i].AssignNeighbour(m_chunks[i + chunkLength], 22);
+                    if(x - 1 >= 0 && y != chunkLength - 1) m_chunks[i].AssignNeighbour(m_chunks[i - 1 + chunkLength], 21);
+
+                    if(x != chunkLength - 1 && y != chunkLength - 1 && z - 1 >= 0) m_chunks[i].AssignNeighbour(m_chunks[i + 1 + chunkLength - chunkLength2], 20);
+                    if(y != chunkLength - 1 && z - 1 >= 0) m_chunks[i].AssignNeighbour(m_chunks[i + chunkLength - chunkLength2], 19);
+                    if(x - 1 >= 0 && y != chunkLength - 1 && z - 1 >= 0) m_chunks[i].AssignNeighbour(m_chunks[i - 1 + chunkLength - chunkLength2], 18);
+                    
+                    if(x != chunkLength - 1 && z != chunkLength - 1) m_chunks[i].AssignNeighbour(m_chunks[i + 1 + chunkLength2], 17);
+                    if(z != chunkLength - 1) m_chunks[i].AssignNeighbour(m_chunks[i + chunkLength2], 16);
+                    if(x - 1 >= 0 && z != chunkLength - 1) m_chunks[i].AssignNeighbour(m_chunks[i - 1 + chunkLength2], 15);
+
+                    if(x != chunkLength - 1) m_chunks[i].AssignNeighbour(m_chunks[i + 1], 14);
+                    if(x - 1 >= 0) m_chunks[i].AssignNeighbour(m_chunks[i - 1], 12);
+
+                    if(x != chunkLength - 1 && z - 1 >= 0) m_chunks[i].AssignNeighbour(m_chunks[i + 1 - chunkLength2], 11);
+                    if(z - 1 >= 0) m_chunks[i].AssignNeighbour(m_chunks[i - chunkLength2], 10);
+                    if(x - 1 >= 0 && z - 1 >= 0) m_chunks[i].AssignNeighbour(m_chunks[i - 1 - chunkLength2], 9);
+
+                    if(x != chunkLength - 1 && y - 1 >= 0 && z != chunkLength - 1) m_chunks[i].AssignNeighbour(m_chunks[i + 1 - chunkLength + chunkLength2], 8);
+                    if(y - 1 >= 0 && z != chunkLength - 1) m_chunks[i].AssignNeighbour(m_chunks[i - chunkLength + chunkLength2], 7);
+                    if(x - 1 >= 0 && y - 1 >= 0 && z != chunkLength - 1) m_chunks[i].AssignNeighbour(m_chunks[i - 1 - chunkLength + chunkLength2], 6);
+
+                    if(x != chunkLength - 1 && y - 1 >= 0) m_chunks[i].AssignNeighbour(m_chunks[i + 1 - chunkLength], 5);
+                    if(y - 1 >= 0) m_chunks[i].AssignNeighbour(m_chunks[i - chunkLength], 4);
+                    if(x - 1 >= 0 && y - 1 >= 0) m_chunks[i].AssignNeighbour(m_chunks[i - 1 - chunkLength], 3);
+
+                    if(x != chunkLength - 1 && y - 1 >= 0 && z - 1 >= 0) m_chunks[i].AssignNeighbour(m_chunks[i + 1 - chunkLength - chunkLength2], 2);
+                    if(y - 1 >= 0 && z - 1 >= 0) m_chunks[i].AssignNeighbour(m_chunks[i - chunkLength - chunkLength2], 1);
+                    if(x - 1 >= 0 && y - 1 >= 0 && z - 1 >= 0) m_chunks[i].AssignNeighbour(m_chunks[i - 1 - chunkLength - chunkLength2], 0);
+                    m_chunks[i].RefreshCollider();
 				}
 			}
 		}
 	}
+    /*
+    public void AssignChunkNeighboursAndRefresh()
+    {
+        int chunkLength = m_chunkLength;
+        int chunkLength2 = m_chunkLength * m_chunkLength;
+        float[] dummyMap = new float[m_chunkRes * m_chunkRes * m_chunkRes];
+        for (int z = 0, i = 0; z < chunkLength; z++)
+        {
+            for (int y = 0; y < chunkLength; y++)
+            {
+                for (int x = 0; x < chunkLength; x++, i++)
+                {
+                    if (x != chunkLength - 1 && y != chunkLength - 1 && z != chunkLength - 1) m_chunks[i].AssignXYZChunkMap(m_chunks[i + 1 + chunkLength + chunkLength2].m_densityMap);
+                    else m_chunks[i].AssignXYZChunkMap(dummyMap);
+                    if (x != chunkLength - 1 && z != chunkLength - 1) m_chunks[i].AssignXZChunkMap(m_chunks[i + 1 + chunkLength2].m_densityMap);
+                    else m_chunks[i].AssignXZChunkMap(dummyMap);
+                    if (y != chunkLength - 1 && z != chunkLength - 1) m_chunks[i].AssignYZChunkMap(m_chunks[i + chunkLength + chunkLength2].m_densityMap);
+                    else m_chunks[i].AssignYZChunkMap(dummyMap);
+                    if (x != chunkLength - 1 && y != chunkLength - 1) m_chunks[i].AssignXYChunkMap(m_chunks[i + 1 + chunkLength].m_densityMap);
+                    else m_chunks[i].AssignXYChunkMap(dummyMap);
+                    if (x != chunkLength - 1) m_chunks[i].AssignXChunkMap(m_chunks[i + 1].m_densityMap);
+                    else m_chunks[i].AssignXChunkMap(dummyMap);
+                    if (y != chunkLength - 1) m_chunks[i].AssignYChunkMap(m_chunks[i + chunkLength].m_densityMap);
+                    else m_chunks[i].AssignYChunkMap(dummyMap);
+                    if (z != chunkLength - 1) m_chunks[i].AssignZChunkMap(m_chunks[i + chunkLength2].m_densityMap);
+                    else m_chunks[i].AssignZChunkMap(dummyMap);
+                    m_chunks[i].Refresh();
+                }
+            }
+        }
+    }*/
 }
