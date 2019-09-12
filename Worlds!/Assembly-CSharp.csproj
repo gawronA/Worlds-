@@ -85,10 +85,11 @@
     <None Include="Assets\Shaders\MarchingCubes\ClearVerticesShader.compute" />
     <None Include="Assets\Scripts\ShaderTutorial\Part 2 First Shader\Textured With Detail.shader" />
     <None Include="Assets\Shaders\MarchingCubes\CalculateNormalsShader.compute" />
-    <None Include="Assets\Shaders\MarchingCubes\DrawStructuredBuffer.shader" />
+    <None Include="Assets\Materials\World\DrawStructuredBuffer.shader" />
     <None Include="Assets\Scripts\ShaderTutorial\Part 2 First Shader\My First Shader.shader" />
     <None Include="Assets\Scripts\ShaderTutorial\Part 2 First Shader\Texture Splatting.shader" />
-    <None Include="Assets\Shaders\MarchingCubes\MarchingCubes.compute" />
+    <None Include="Assets\Shaders\MarchingCubes\MCColliderShader.compute" />
+    <None Include="Assets\Shaders\MarchingCubes\MCRenderShader.compute" />
     <Reference Include="Unity.Timeline.Editor">
       <HintPath>D:/Unity/Projects/Worlds!/Worlds!/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
     </Reference>

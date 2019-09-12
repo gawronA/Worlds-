@@ -10,6 +10,7 @@ SamplerState _LinearClamp;
 
 float _Scale;
 uint _Lod;
+float3 _ChunkPosition;
 
 uint _DensityMap_sizex, _DensityMap_sizey, _DensityMap_sizez;
 float _DensityOffset;
@@ -148,31 +149,23 @@ void FillCellXYZ(int x, int y, int z, out float cell[8])
 	cell[1] = _BorderMapx[y * _Lod + z * _Lod * _DensityMap_sizey];
 	cell[2] = _BorderMapxy[z * _Lod];
 	cell[3] = _BorderMapy[x * _Lod + z * _Lod * _DensityMap_sizex];
-    //cell[1] = _DensityMap[(x + 1) * _Lod + y * _Lod * _DensityMap_sizex + z * _Lod * _DensityMap_sziexy];
-   // cell[2] = _DensityMap[((x + 1) * _Lod) + ((y + 1) * _Lod * _DensityMap_sizex) + (z * _Lod * _DensityMap_sziexy)];
-   // cell[3] = _DensityMap[x * _Lod + (y + 1) * _Lod * _DensityMap_sizex + z * _Lod * _DensityMap_sziexy];
     
 	cell[4] = _BorderMapz[x * _Lod + y * _Lod * _DensityMap_sizex];
 	cell[5] = _BorderMapxz[y * _Lod];
 	cell[6] = _BorderMapxyz;
 	cell[7] = _BorderMapyz[x * _Lod];
-//	cell[4] = _DensityMap[x * _Lod + y * _Lod * _DensityMap_sizex + (z + 1) * _Lod * _DensityMap_sziexy];
-	//cell[5] = _DensityMap[(x + 1) * _Lod + y * _Lod * _DensityMap_sizex + (z + 1) * _Lod * _DensityMap_sziexy];
-  //  cell[6] = _DensityMap[(x + 1) * _Lod + (y + 1) * _Lod * _DensityMap_sizex + (z + 1) * _Lod * _DensityMap_sziexy];
-   // cell[7] = _DensityMap[x * _Lod + (y + 1) * _Lod * _DensityMap_sizex + (z + 1) * _Lod * _DensityMap_sziexy];
 }
 
 float CalculateOffset(float v1, float v2)
 {
     float delta = v2 - v1;
     return (delta == 0.0f) ? 0.5f : (_DensityOffset - v1) / delta;
-
 }
 
 Vertex CreateVertex(float3 position, float3 normalsTextureSize)
 {
     Vertex vert;
-    vert.position = float4(position * _Scale, 1.0f);
+    vert.position = float4((position + _ChunkPosition) * _Scale, 1.0f);
 
 	float3 uv = position / normalsTextureSize;
 	vert.normal = _Normals.SampleLevel(_LinearClamp, uv, 0);

@@ -1,6 +1,6 @@
 ﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
 
-Shader "Shaders/MarchingCubes/DrawMeshShader" 
+Shader "Materials/World/DrawMeshShader" 
 {
 	SubShader 
 	{
@@ -34,6 +34,7 @@ Shader "Shaders/MarchingCubes/DrawMeshShader"
 
 				v2f OUT;
 				OUT.pos = UnityObjectToClipPos(float4(vert.position.xyz, 1));
+				//OUT.pos = float4(vert.position.xyz, 1);
 				
 				OUT.col = dot(float3(0,1,0), vert.normal) * 0.5 + 0.5;
 				

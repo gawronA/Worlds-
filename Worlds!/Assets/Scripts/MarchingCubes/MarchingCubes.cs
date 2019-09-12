@@ -7,13 +7,25 @@ namespace ProceduralTerrain
 {
 	namespace MarchingCubes
 	{
-		public class MarchingCubes
+        public struct BorderDensities
+        {
+            public float[] borderMapx;
+            public float[] borderMapy;
+            public float[] borderMapz;
+            public float[] borderMapxy;
+            public float[] borderMapyz;
+            public float[] borderMapxz;
+            public float[] borderMapxyz;
+        }
+
+        public class MarchingCubes
 		{
 
-			public ComputeShader m_marchingCubesShader;
+			public ComputeShader m_MCRenderShader;
+            public ComputeShader m_MCColliderShader;
 			public ComputeShader m_clearVerticesShader;
 			public ComputeShader m_calculateNormalsShader;
-            public Material m_drawMesh;
+            public Material m_meshMaterial;
 			public float m_offset = 0.0f;
 			public bool m_recalculateNormals = false;
 
@@ -40,37 +52,28 @@ namespace ProceduralTerrain
 			#pragma warning disable 0649
 			struct Vertex
 			{
-				
 				public Vector4 position;
 				public Vector3 normal;
-				
 			};
 			#pragma warning restore 0649
 
-			public void Initalize(int x_dim, int y_dim, int z_dim, float size, int lod)
+            
+
+			public void InitalizeRenderMesh(int x_dim, int y_dim, int z_dim, float size)
 			{
 				//each dimension must be divisable by 8, densitymap and MC shader must be present
 				if(x_dim % 8 != 0 || y_dim % 8 != 0 || z_dim % 8 != 0) throw new System.ArgumentException("x, y or z must be divisible by 8");
-				if(lod < 0 || lod > 3) throw new System.ArgumentException("lewel-of-detail must be in range 0 to 3");
-				if(m_marchingCubesShader == null) throw new System.ArgumentException("Missing MarchingCubesShader");
+				if(m_MCRenderShader == null) throw new System.ArgumentException("Missing MCRenderShader");
 				if(m_clearVerticesShader == null) throw new System.ArgumentException("Missing ClearVerticesShader");
 				if(m_calculateNormalsShader == null) throw new System.ArgumentException("Missing CalculateNormalsShader");
 
-                //CameraPostRender.AddEvent(Camera.main, DrawMesh);
+                CameraPostRender.AddEvent(Camera.main, DrawMesh);
 
 				m_x_dim = x_dim;
 				m_y_dim = y_dim;
 				m_z_dim = z_dim;
 
 				m_scale = size;
-
-				m_lod = (int)Mathf.Pow(2, lod);
-				m_x_lod_dim = x_dim / m_lod;
-				m_y_lod_dim = y_dim / m_lod;
-				m_z_lod_dim = z_dim / m_lod;
-				
-				//max verts
-				m_maxVertices = m_x_lod_dim * m_y_lod_dim * m_z_lod_dim * 5 * 3;
 
 				//MarchingCubes
 				//tables
@@ -79,8 +82,6 @@ namespace ProceduralTerrain
 				m_traingleConnectionTable = new ComputeBuffer(256 * 16, sizeof(int));
 				m_traingleConnectionTable.SetData(MarchingCubesTables.TriangleConnectionTable);
 
-				//output mesh. 
-				m_meshBuffer = new ComputeBuffer(m_maxVertices, sizeof(float) * 7);
 				m_densityBuffer = new ComputeBuffer(m_x_dim * m_y_dim * m_z_dim, sizeof(float));
 				m_ChunkXdensityBuffer = new ComputeBuffer(2 * m_y_dim * m_z_dim, sizeof(float));
 				m_ChunkYdensityBuffer = new ComputeBuffer(2 * m_x_dim * m_z_dim, sizeof(float));
@@ -101,51 +102,181 @@ namespace ProceduralTerrain
 				m_normalsTexture.Create();
 
 				//initalize variables in MC, ClearVertices, initalize normals shader
-				InitMC();
-				InitMesh();
+				InitRenderMC();
+				InitRenderMesh();
 				InitNormals();
 			}
 
-			public Mesh ComputeMesh(float[] densityMap, float[] borderMapx, float[] borderMapy, float[] borderMapz, float[] borderMapxy, float[] borderMapyz, float[] borderMapxz, float[] borderMapxyz)
+            public void SetLOD(int lod)
+            {
+                if(lod < 0 || lod > 3) throw new System.ArgumentException("level-of-detail must be in range 0 to 3");
+
+                m_lod = (int)Mathf.Pow(2, lod);
+                m_x_lod_dim = m_x_dim / m_lod;
+                m_y_lod_dim = m_y_dim / m_lod;
+                m_z_lod_dim = m_z_dim / m_lod;
+
+                //max verts
+                m_maxVertices = m_x_lod_dim * m_y_lod_dim * m_z_lod_dim * 5 * 3;
+
+                //output mesh. 
+                if(m_meshBuffer != null) m_meshBuffer.Release();
+                m_meshBuffer = new ComputeBuffer(m_maxVertices, sizeof(float) * 7);
+
+                m_MCRenderShader.SetInt("_Lod", m_lod);
+                m_calculateNormalsShader.SetInt("_Lod", m_lod);
+
+                InitRenderMesh();
+            }
+
+            public void ComputeRenderMesh(float[] densityMap, BorderDensities maps, Vector3 chunkPosition)
+            {
+                m_densityBuffer.SetData(densityMap);
+                m_ChunkXdensityBuffer.SetData(maps.borderMapx);
+                m_ChunkYdensityBuffer.SetData(maps.borderMapy);
+                m_ChunkZdensityBuffer.SetData(maps.borderMapz);
+                m_ChunkXYdensityBuffer.SetData(maps.borderMapxy);
+                m_ChunkYZdensityBuffer.SetData(maps.borderMapyz);
+                m_ChunkXZdensityBuffer.SetData(maps.borderMapxz);
+                m_ChunkXYZdensityBuffer.SetData(maps.borderMapxyz);
+
+                //Clear vertices
+                m_clearVerticesShader.SetBuffer(0, "_Vertices", m_meshBuffer);
+                m_clearVerticesShader.Dispatch(0, m_x_lod_dim / (8 / m_lod), m_y_lod_dim / (8 / m_lod), m_z_lod_dim / (8 / m_lod));
+
+                //Calculate normals
+                m_calculateNormalsShader.SetBuffer(0, "_DensityMap", m_densityBuffer);
+                m_calculateNormalsShader.SetBuffer(0, "_BorderMapx", m_ChunkXdensityBuffer);
+                m_calculateNormalsShader.SetBuffer(0, "_BorderMapy", m_ChunkYdensityBuffer);
+                m_calculateNormalsShader.SetBuffer(0, "_BorderMapz", m_ChunkZdensityBuffer);
+                m_calculateNormalsShader.SetBuffer(0, "_BorderMapxy", m_ChunkXYdensityBuffer);
+                m_calculateNormalsShader.SetBuffer(0, "_BorderMapyz", m_ChunkYZdensityBuffer);
+                m_calculateNormalsShader.SetBuffer(0, "_BorderMapxz", m_ChunkXZdensityBuffer);
+                m_calculateNormalsShader.SetBuffer(0, "_BorderMapxyz", m_ChunkXYZdensityBuffer);
+                m_calculateNormalsShader.SetTexture(0, "_Normals", m_normalsTexture);
+                m_calculateNormalsShader.Dispatch(0, m_x_dim / 8, m_y_dim / 8, m_z_dim / 8);
+
+                //Initalize MC
+                m_MCRenderShader.SetFloats("_ChunkPosition", new float[] { chunkPosition.x, chunkPosition.y, chunkPosition.z });
+                m_MCRenderShader.SetFloat("_DensityOffset", m_offset);
+                m_MCRenderShader.SetTexture(0, "_Normals", m_normalsTexture);
+                m_MCRenderShader.SetBuffer(0, "_Vertices", m_meshBuffer);
+                m_MCRenderShader.SetBuffer(0, "_DensityMap", m_densityBuffer);
+                m_MCRenderShader.SetBuffer(0, "_BorderMapx", m_ChunkXdensityBuffer);
+                m_MCRenderShader.SetBuffer(0, "_BorderMapy", m_ChunkYdensityBuffer);
+                m_MCRenderShader.SetBuffer(0, "_BorderMapz", m_ChunkZdensityBuffer);
+                m_MCRenderShader.SetBuffer(0, "_BorderMapxy", m_ChunkXYdensityBuffer);
+                m_MCRenderShader.SetBuffer(0, "_BorderMapyz", m_ChunkYZdensityBuffer);
+                m_MCRenderShader.SetBuffer(0, "_BorderMapxz", m_ChunkXZdensityBuffer);
+                m_MCRenderShader.SetFloat("_BorderMapxyz", maps.borderMapxyz[0]);
+                m_MCRenderShader.Dispatch(0, m_x_lod_dim / (8 / m_lod), m_y_lod_dim / (8 / m_lod), m_z_lod_dim / (8 / m_lod)); //start the magic
+
+            }
+
+            private void InitRenderMC()
+            {
+                m_MCRenderShader.SetInt("_DensityMap_sizex", m_x_dim);
+                m_MCRenderShader.SetInt("_DensityMap_sizey", m_y_dim);
+                m_MCRenderShader.SetInt("_DensityMap_sizez", m_z_dim);
+                m_MCRenderShader.SetFloat("_DensityOffset", m_offset);
+                m_MCRenderShader.SetFloat("_Scale", m_scale);
+                m_MCRenderShader.SetBool("_RecalculateNormals", m_recalculateNormals);
+                m_MCRenderShader.SetBuffer(0, "_CubeEdgeFlags", m_cubeEdgeFlags);
+                m_MCRenderShader.SetBuffer(0, "_TriangleConnectionTable", m_traingleConnectionTable);
+            }
+
+            private void InitRenderMesh()
+            {
+                //Filling with -1 to all the vertices have.w direction -1(which means that it has not been modified)
+                m_clearVerticesShader.SetInt("_x", m_x_lod_dim);
+                m_clearVerticesShader.SetInt("_y", m_y_lod_dim);
+                m_clearVerticesShader.SetInt("_z", m_z_lod_dim);
+                //m_clearVerticesShader.SetBuffer(0, "_Vertices", m_meshBuffer);
+            }
+
+            private void InitNormals()
+            {
+                m_calculateNormalsShader.SetInt("_x", m_x_dim);
+                m_calculateNormalsShader.SetInt("_y", m_y_dim);
+                m_calculateNormalsShader.SetInt("_z", m_z_dim);
+            }
+
+            public void DrawMesh(Camera camera)
+            {
+                m_meshMaterial.SetBuffer("_MeshBuffer", m_meshBuffer);
+                m_meshMaterial.SetPass(0);
+                Graphics.DrawProceduralNow(MeshTopology.Triangles, m_maxVertices);
+            }
+
+
+
+
+            public void InitalizeColliderCompute(int x_dim, int y_dim, int z_dim, float size)
+            {
+                //each dimension must be divisable by 8, densitymap and MC shader must be present
+                if(x_dim % 8 != 0 || y_dim % 8 != 0 || z_dim % 8 != 0) throw new System.ArgumentException("x, y or z must be divisible by 8");
+                if(m_MCColliderShader == null) throw new System.ArgumentException("Missing MCColliderShader");
+                if(m_clearVerticesShader == null) throw new System.ArgumentException("Missing ClearVerticesShader");
+
+                m_x_dim = x_dim;
+                m_y_dim = y_dim;
+                m_z_dim = z_dim;
+
+                m_scale = size;
+
+                //max verts
+                m_maxVertices = m_x_dim * m_y_dim * m_z_dim * 5 * 3;
+
+                //MarchingCubes
+                //tables
+                m_cubeEdgeFlags = new ComputeBuffer(256, sizeof(int));
+                m_cubeEdgeFlags.SetData(MarchingCubesTables.CubeEdgeFlags);
+                m_traingleConnectionTable = new ComputeBuffer(256 * 16, sizeof(int));
+                m_traingleConnectionTable.SetData(MarchingCubesTables.TriangleConnectionTable);
+
+                //output mesh. 
+                m_meshBuffer = new ComputeBuffer(m_maxVertices, sizeof(float) * 7);
+                m_densityBuffer = new ComputeBuffer(m_x_dim * m_y_dim * m_z_dim, sizeof(float));
+                m_ChunkXdensityBuffer = new ComputeBuffer(2 * m_y_dim * m_z_dim, sizeof(float));
+                m_ChunkYdensityBuffer = new ComputeBuffer(2 * m_x_dim * m_z_dim, sizeof(float));
+                m_ChunkZdensityBuffer = new ComputeBuffer(2 * m_x_dim * m_y_dim, sizeof(float));
+                m_ChunkXYdensityBuffer = new ComputeBuffer(3 * m_z_dim, sizeof(float));
+                m_ChunkYZdensityBuffer = new ComputeBuffer(3 * m_x_dim, sizeof(float));
+                m_ChunkXZdensityBuffer = new ComputeBuffer(3 * m_y_dim, sizeof(float));
+                m_ChunkXYZdensityBuffer = new ComputeBuffer(4, sizeof(float));
+
+                //initalize variables in MC, ClearVertices, initalize normals shader
+                InitColliderMC();
+                InitColliderMesh();
+            }
+
+            public Mesh ComputeColliderMesh(float[] densityMap, BorderDensities maps)
 			{
 				m_densityBuffer.SetData(densityMap);
-				m_ChunkXdensityBuffer.SetData(borderMapx);
-				m_ChunkYdensityBuffer.SetData(borderMapy);
-				m_ChunkZdensityBuffer.SetData(borderMapz);
-				m_ChunkXYdensityBuffer.SetData(borderMapxy);
-				m_ChunkYZdensityBuffer.SetData(borderMapyz);
-				m_ChunkXZdensityBuffer.SetData(borderMapxz);
-				m_ChunkXYZdensityBuffer.SetData(borderMapxyz);
+				m_ChunkXdensityBuffer.SetData(maps.borderMapx);
+				m_ChunkYdensityBuffer.SetData(maps.borderMapy);
+				m_ChunkZdensityBuffer.SetData(maps.borderMapz);
+				m_ChunkXYdensityBuffer.SetData(maps.borderMapxy);
+				m_ChunkYZdensityBuffer.SetData(maps.borderMapyz);
+				m_ChunkXZdensityBuffer.SetData(maps.borderMapxz);
+				m_ChunkXYZdensityBuffer.SetData(maps.borderMapxyz);
 
 				//Clear vertices
 				m_clearVerticesShader.SetBuffer(0, "_Vertices", m_meshBuffer);
-				m_clearVerticesShader.Dispatch(0, m_x_lod_dim / (8 / m_lod), m_y_lod_dim / (8 / m_lod), m_z_lod_dim / (8 / m_lod));
-
-				//Calculate normals
-				m_calculateNormalsShader.SetBuffer(0, "_DensityMap", m_densityBuffer);
-				m_calculateNormalsShader.SetBuffer(0, "_BorderMapx", m_ChunkXdensityBuffer);
-				m_calculateNormalsShader.SetBuffer(0, "_BorderMapy", m_ChunkYdensityBuffer);
-				m_calculateNormalsShader.SetBuffer(0, "_BorderMapz", m_ChunkZdensityBuffer);
-				m_calculateNormalsShader.SetBuffer(0, "_BorderMapxy", m_ChunkXYdensityBuffer);
-				m_calculateNormalsShader.SetBuffer(0, "_BorderMapyz", m_ChunkYZdensityBuffer);
-				m_calculateNormalsShader.SetBuffer(0, "_BorderMapxz", m_ChunkXZdensityBuffer);
-				m_calculateNormalsShader.SetBuffer(0, "_BorderMapxyz", m_ChunkXYZdensityBuffer);
-				m_calculateNormalsShader.SetTexture(0, "_Normals", m_normalsTexture);
-				m_calculateNormalsShader.Dispatch(0, m_x_dim / 8, m_y_dim / 8, m_z_dim / 8);
-
+				m_clearVerticesShader.Dispatch(0, m_x_dim / 8, m_y_dim / 8, m_z_dim / 8);
+                
 				//Initalize MC
-				m_marchingCubesShader.SetFloat("_DensityOffset", m_offset);
-				m_marchingCubesShader.SetTexture(0, "_Normals", m_normalsTexture);
-				m_marchingCubesShader.SetBuffer(0, "_Vertices", m_meshBuffer);
-				m_marchingCubesShader.SetBuffer(0, "_DensityMap", m_densityBuffer);
-				m_marchingCubesShader.SetBuffer(0, "_BorderMapx", m_ChunkXdensityBuffer);
-				m_marchingCubesShader.SetBuffer(0, "_BorderMapy", m_ChunkYdensityBuffer);
-				m_marchingCubesShader.SetBuffer(0, "_BorderMapz", m_ChunkZdensityBuffer);
-				m_marchingCubesShader.SetBuffer(0, "_BorderMapxy", m_ChunkXYdensityBuffer);
-				m_marchingCubesShader.SetBuffer(0, "_BorderMapyz", m_ChunkYZdensityBuffer);
-				m_marchingCubesShader.SetBuffer(0, "_BorderMapxz", m_ChunkXZdensityBuffer);
-				m_marchingCubesShader.SetFloat("_BorderMapxyz", borderMapxyz[0]);
-				m_marchingCubesShader.Dispatch(0, m_x_lod_dim / (8 / m_lod), m_y_lod_dim / (8 / m_lod), m_z_lod_dim / (8 / m_lod)); //start the magic
+				m_MCColliderShader.SetFloat("_DensityOffset", m_offset);
+				m_MCColliderShader.SetBuffer(0, "_Vertices", m_meshBuffer);
+				m_MCColliderShader.SetBuffer(0, "_DensityMap", m_densityBuffer);
+				m_MCColliderShader.SetBuffer(0, "_BorderMapx", m_ChunkXdensityBuffer);
+				m_MCColliderShader.SetBuffer(0, "_BorderMapy", m_ChunkYdensityBuffer);
+				m_MCColliderShader.SetBuffer(0, "_BorderMapz", m_ChunkZdensityBuffer);
+				m_MCColliderShader.SetBuffer(0, "_BorderMapxy", m_ChunkXYdensityBuffer);
+				m_MCColliderShader.SetBuffer(0, "_BorderMapyz", m_ChunkYZdensityBuffer);
+				m_MCColliderShader.SetBuffer(0, "_BorderMapxz", m_ChunkXZdensityBuffer);
+				m_MCColliderShader.SetFloat("_BorderMapxyz", maps.borderMapxyz[0]);
+				m_MCColliderShader.Dispatch(0, m_x_dim / 8, m_y_dim / 8, m_z_dim / 8); //start the magic
 
                 //receive the verts
                 Vertex[] receivedData = new Vertex[m_maxVertices];
@@ -160,70 +291,51 @@ namespace ProceduralTerrain
 					if(receivedData[i].position.w != -1.0f)
 					{
 						vertices.Add(new Vector3(receivedData[i].position.x, receivedData[i].position.y, receivedData[i].position.z));
-						normals.Add(new Vector3(receivedData[i].normal.x, receivedData[i].normal.y, receivedData[i].normal.z));
 						triangles.Add(idx++);
 					}
 				}
 
 				mesh.SetVertices(vertices);
-				mesh.SetNormals(normals);
 				mesh.SetTriangles(triangles, 0);
 
                 return mesh;
                 //return new Mesh();
 			}
 
-			private void InitMC()
-			{
-				m_marchingCubesShader.SetInt("_DensityMap_sizex", m_x_dim);
-				m_marchingCubesShader.SetInt("_DensityMap_sizey", m_y_dim);
-				m_marchingCubesShader.SetInt("_DensityMap_sizez", m_z_dim);
-				m_marchingCubesShader.SetInt("_Lod", m_lod);
-				m_marchingCubesShader.SetFloat("_DensityOffset", m_offset);
-				m_marchingCubesShader.SetFloat("_Scale", m_scale);
-				m_marchingCubesShader.SetBool("_RecalculateNormals", m_recalculateNormals);
-				m_marchingCubesShader.SetBuffer(0, "_CubeEdgeFlags", m_cubeEdgeFlags);
-				m_marchingCubesShader.SetBuffer(0, "_TriangleConnectionTable", m_traingleConnectionTable);
-			}
-
-			private void InitMesh()
-			{
-				//Filling with -1 to all the vertices have.w direction -1(which means that it has not been modified)
-				m_clearVerticesShader.SetInt("_x", m_x_lod_dim);
-				m_clearVerticesShader.SetInt("_y", m_y_lod_dim);
-				m_clearVerticesShader.SetInt("_z", m_z_lod_dim);
-				m_clearVerticesShader.SetBuffer(0, "_Vertices", m_meshBuffer);
-			}
-
-			private void InitNormals()
-			{
-				m_calculateNormalsShader.SetInt("_x", m_x_dim);
-				m_calculateNormalsShader.SetInt("_y", m_y_dim);
-				m_calculateNormalsShader.SetInt("_z", m_z_dim);
-				m_calculateNormalsShader.SetInt("_Lod", m_lod);
-				m_calculateNormalsShader.SetTexture(0, "_Normals", m_normalsTexture);
-			}
-
-            /*public void DrawMesh(Camera camera)
+            private void InitColliderMC()
             {
-                m_drawMesh.SetBuffer("_MeshBuffer", m_meshBuffer);
-                m_drawMesh.SetPass(0);
-                Graphics.DrawProceduralNow(MeshTopology.Triangles, m_maxVertices);
-            }*/
+                m_MCColliderShader.SetInt("_DensityMap_sizex", m_x_dim);
+                m_MCColliderShader.SetInt("_DensityMap_sizey", m_y_dim);
+                m_MCColliderShader.SetInt("_DensityMap_sizez", m_z_dim);
+                m_MCColliderShader.SetFloat("_DensityOffset", m_offset);
+                m_MCColliderShader.SetFloat("_Scale", m_scale);
+                m_MCColliderShader.SetBuffer(0, "_CubeEdgeFlags", m_cubeEdgeFlags);
+                m_MCColliderShader.SetBuffer(0, "_TriangleConnectionTable", m_traingleConnectionTable);
+            }
+
+            private void InitColliderMesh()
+            {
+                //Filling with -1 to all the vertices have.w direction -1(which means that it has not been modified)
+                m_clearVerticesShader.SetInt("_x", m_x_dim);
+                m_clearVerticesShader.SetInt("_y", m_y_dim);
+                m_clearVerticesShader.SetInt("_z", m_z_dim);
+            }
+
+            
 
 			public void Release()
 			{
-				m_cubeEdgeFlags.Release();
-				m_traingleConnectionTable.Release();
-				m_meshBuffer.Release();
-				m_densityBuffer.Release();
-				m_ChunkXdensityBuffer.Release();
-				m_ChunkYdensityBuffer.Release();
-				m_ChunkZdensityBuffer.Release();
-				m_ChunkXYdensityBuffer.Release();
-				m_ChunkYZdensityBuffer.Release();
-				m_ChunkXZdensityBuffer.Release();
-				m_ChunkXYZdensityBuffer.Release();
+				if(m_cubeEdgeFlags != null) m_cubeEdgeFlags.Release();
+                if(m_traingleConnectionTable != null) m_traingleConnectionTable.Release();
+                if(m_meshBuffer != null) m_meshBuffer.Release();
+                if(m_densityBuffer != null) m_densityBuffer.Release();
+                if(m_ChunkXdensityBuffer != null) m_ChunkXdensityBuffer.Release();
+                if(m_ChunkYdensityBuffer != null) m_ChunkYdensityBuffer.Release();
+                if(m_ChunkZdensityBuffer != null) m_ChunkZdensityBuffer.Release();
+                if(m_ChunkXYdensityBuffer != null) m_ChunkXYdensityBuffer.Release();
+                if(m_ChunkYZdensityBuffer != null) m_ChunkYZdensityBuffer.Release();
+                if(m_ChunkXZdensityBuffer != null) m_ChunkXZdensityBuffer.Release();
+                if(m_ChunkXYZdensityBuffer != null) m_ChunkXYZdensityBuffer.Release();
 			}
 		}
 	}

@@ -10,8 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4671104820544544}
   - component: {fileID: 114005705909331790}
-  - component: {fileID: 33922021955510480}
-  - component: {fileID: 23997758666233420}
   - component: {fileID: 64545235715987574}
   m_Layer: 0
   m_Name: PlanetChunk
@@ -49,62 +47,16 @@ MonoBehaviour:
   showNormals: 0
   refresh: 1
   continousRefresh: 0
-  m_lod1Distance: 100
-  m_lod2Distance: 500
-  m_lod3Distance: 1000
-  m_MarchingCubesShader: {fileID: 7200000, guid: 5accd0df264625845b084ad3587a684b,
-    type: 3}
+  m_lod1Distance: 10
+  m_lod2Distance: 50
+  m_lod3Distance: 100
+  m_MCRenderShader: {fileID: 7200000, guid: 5accd0df264625845b084ad3587a684b, type: 3}
+  m_MCColliderShader: {fileID: 7200000, guid: 049af54ef0747d44daea72202051a34f, type: 3}
   m_ClearVerticesShader: {fileID: 7200000, guid: f94777e24265ec34190746726e245745,
     type: 3}
   m_CalculateNormalsShader: {fileID: 7200000, guid: 5be0259b2cf14c34181a89d175814980,
     type: 3}
-  m_DrawMeshShader: {fileID: 2100000, guid: d77459f1d283e81468c2a8483f53ec42, type: 2}
---- !u!33 &33922021955510480
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1183231140867592}
-  m_Mesh: {fileID: 0}
---- !u!23 &23997758666233420
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1183231140867592}
-  m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RenderingLayerMask: 4294967295
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 10302, guid: 0000000000000000f000000000000000, type: 0}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 0
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_meshMaterial: {fileID: 2100000, guid: d77459f1d283e81468c2a8483f53ec42, type: 2}
 --- !u!64 &64545235715987574
 MeshCollider:
   m_ObjectHideFlags: 0
