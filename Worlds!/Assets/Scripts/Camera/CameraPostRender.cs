@@ -6,7 +6,7 @@ public class CameraPostRender : CameraRenderEvent
 {
     public CameraEventHandler d_event = delegate { };
 
-    private void OnRenderObject()
+    private void OnPostRender()
     {
         d_event(m_camera);
     }

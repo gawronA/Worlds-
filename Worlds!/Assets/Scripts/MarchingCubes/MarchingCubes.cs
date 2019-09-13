@@ -29,6 +29,9 @@ namespace ProceduralTerrain
 			public float m_offset = 0.0f;
 			public bool m_recalculateNormals = false;
 
+            public Vector3 m_chunkPosition;
+            public int m_layer;
+
 			int m_x_dim;
 			int m_y_dim;
 			int m_z_dim;
@@ -67,7 +70,7 @@ namespace ProceduralTerrain
 				if(m_clearVerticesShader == null) throw new System.ArgumentException("Missing ClearVerticesShader");
 				if(m_calculateNormalsShader == null) throw new System.ArgumentException("Missing CalculateNormalsShader");
 
-                CameraPostRender.AddEvent(Camera.main, DrawMesh);
+                //CameraPostRender.AddEvent(Camera.main, DrawMesh);
 
 				m_x_dim = x_dim;
 				m_y_dim = y_dim;
@@ -203,12 +206,20 @@ namespace ProceduralTerrain
 
             public void DrawMesh(Camera camera)
             {
-                m_meshMaterial.SetBuffer("_MeshBuffer", m_meshBuffer);
+               m_meshMaterial.SetBuffer("_MeshBuffer", m_meshBuffer);
                 m_meshMaterial.SetPass(0);
                 Graphics.DrawProceduralNow(MeshTopology.Triangles, m_maxVertices);
+                
             }
 
-
+            public void DrawMesh()
+            {
+                m_meshMaterial.SetBuffer("_MeshBuffer", m_meshBuffer);
+                m_meshMaterial.SetPass(0);
+                Graphics.DrawProcedural(m_meshMaterial,
+                                        new Bounds(m_chunkPosition + new Vector3(m_x_dim / 2, m_y_dim / 2, m_z_dim / 2), new Vector3(m_x_dim / 2, m_y_dim / 2, m_z_dim / 2)),
+                                        MeshTopology.Triangles, m_maxVertices,1, null, null, UnityEngine.Rendering.ShadowCastingMode.TwoSided, true, m_layer);
+            }
 
 
             public void InitalizeColliderCompute(int x_dim, int y_dim, int z_dim, float size)

@@ -56,7 +56,8 @@ public unsafe class PlanetChunk : MonoBehaviour
         else if(playerDistance <= m_lod3Distance && playerDistance > m_lod2Distance && m_lod != 2) RefreshMesh(2);
         else if(playerDistance <= m_lod2Distance && playerDistance > m_lod1Distance && m_lod != 1) RefreshMesh(1);
         else if(playerDistance <= m_lod1Distance && m_lod != 0) RefreshMesh(0);
-        
+
+        m_mcRender.DrawMesh();
 	}
 
 	private void OnValidate()
@@ -89,7 +90,9 @@ public unsafe class PlanetChunk : MonoBehaviour
             m_clearVerticesShader = m_ClearVerticesShader,
             m_calculateNormalsShader = m_CalculateNormalsShader,
             m_meshMaterial = m_meshMaterial,
-			m_recalculateNormals = sharpEdges
+			m_recalculateNormals = sharpEdges,
+            m_chunkPosition = transform.position,
+            m_layer = gameObject.layer
 		};
         m_mcRender.InitalizeRenderMesh(m_res, m_res, m_res, m_scale);
 
