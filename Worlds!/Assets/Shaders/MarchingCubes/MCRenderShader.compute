@@ -10,7 +10,7 @@ SamplerState _LinearClamp;
 
 float _Scale;
 uint _Lod;
-float3 _ChunkPosition;
+//float3 _ChunkPosition;
 
 uint _DensityMap_sizex, _DensityMap_sizey, _DensityMap_sizez;
 float _DensityOffset;
@@ -165,7 +165,7 @@ float CalculateOffset(float v1, float v2)
 Vertex CreateVertex(float3 position, float3 normalsTextureSize)
 {
     Vertex vert;
-    vert.position = float4((position + _ChunkPosition) * _Scale, 1.0f);
+    vert.position = float4((position) * _Scale, 1.0f);
 
 	float3 uv = position / normalsTextureSize;
 	vert.normal = _Normals.SampleLevel(_LinearClamp, uv, 0);

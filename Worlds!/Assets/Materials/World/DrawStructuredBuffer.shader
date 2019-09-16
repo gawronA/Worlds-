@@ -6,11 +6,12 @@ Shader "Materials/World/DrawMeshShader"
 	{
 		Pass 
 		{
-			Cull back
+			Tags { "RenderType"="Opaque" }
+			Cull off
 
 			CGPROGRAM
 			#include "UnityCG.cginc"
-			#pragma target 5.0
+			#pragma target 3.0
 			#pragma vertex vert
 			#pragma fragment frag
 			
@@ -25,7 +26,7 @@ Shader "Materials/World/DrawMeshShader"
 			struct v2f 
 			{
 				float4  pos : SV_POSITION;
-				float3 col : Color;
+				float3 col : COLOR;
 			};
 
 			v2f vert(uint id : SV_VertexID)

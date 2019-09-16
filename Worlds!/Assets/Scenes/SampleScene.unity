@@ -576,10 +576,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_radius: 50
-  m_est_border: 25
-  m_scale: 1
-  m_xyzResolution: 24
-  m_sharpEdges: 1
+  m_est_border: 20
+  m_scale: 5
+  m_xyzResolution: 16
+  m_sharpEdges: 0
   m_planetPrefab: {fileID: 1800079048482476, guid: 10b88e84e1d50274a818277016a46396,
     type: 3}
   m_planetChunkPrefab: {fileID: 1183231140867592, guid: 95ff09b99cb48ad42a3d3b49daf3ab1d,
@@ -626,7 +626,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1685906147}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -19.7}
+  m_LocalPosition: {x: 0, y: 0, z: -1.22}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 534669905}

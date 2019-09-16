@@ -65,7 +65,12 @@ public unsafe class PlanetChunk : MonoBehaviour
 		if(showNormals) DrawNormals();
 	}
 
-	private void OnDestroy()
+    private void OnDrawGizmos()
+    {
+        Gizmos.DrawWireCube(m_mcRender.m_bounds.center, m_mcRender.m_bounds.size);
+    }
+
+    private void OnDestroy()
 	{
 		m_mcRender.Release();
         m_mcCollider.Release();
@@ -77,7 +82,7 @@ public unsafe class PlanetChunk : MonoBehaviour
 		m_res = res;
 		m_res2 = m_res * m_res;
 		m_scale = scale;
-        m_center = transform.TransformPoint(new Vector3((float)m_res / 2, (float)m_res / 2, (float)m_res / 2));
+        //m_center = transform.TransformPoint(new Vector3((float)m_res / 2, (float)m_res / 2, (float)m_res / 2));
 
         m_neighbourChunks = new PlanetChunk[27];
 
@@ -90,9 +95,8 @@ public unsafe class PlanetChunk : MonoBehaviour
             m_clearVerticesShader = m_ClearVerticesShader,
             m_calculateNormalsShader = m_CalculateNormalsShader,
             m_meshMaterial = m_meshMaterial,
-			m_recalculateNormals = sharpEdges,
-            m_chunkPosition = transform.position,
-            m_layer = gameObject.layer
+            m_recalculateNormals = sharpEdges,
+            m_chunkTransform = transform
 		};
         m_mcRender.InitalizeRenderMesh(m_res, m_res, m_res, m_scale);
 
@@ -111,7 +115,6 @@ public unsafe class PlanetChunk : MonoBehaviour
         m_borderMaps.borderMapyz = new float[3 * m_res];
         m_borderMaps.borderMapxz = new float[3 * m_res];
         m_borderMaps.borderMapxyz = new float[4];
-
     }
 
 	public void SetDensityMap(float[] map)

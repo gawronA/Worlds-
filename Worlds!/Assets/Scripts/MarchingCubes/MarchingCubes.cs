@@ -29,8 +29,10 @@ namespace ProceduralTerrain
 			public float m_offset = 0.0f;
 			public bool m_recalculateNormals = false;
 
-            public Vector3 m_chunkPosition;
-            public int m_layer;
+            public Transform m_chunkTransform;
+
+            MaterialPropertyBlock m_propertyBlock;
+            public Bounds m_bounds;
 
 			int m_x_dim;
 			int m_y_dim;
@@ -70,13 +72,15 @@ namespace ProceduralTerrain
 				if(m_clearVerticesShader == null) throw new System.ArgumentException("Missing ClearVerticesShader");
 				if(m_calculateNormalsShader == null) throw new System.ArgumentException("Missing CalculateNormalsShader");
 
-                //CameraPostRender.AddEvent(Camera.main, DrawMesh);
-
 				m_x_dim = x_dim;
 				m_y_dim = y_dim;
 				m_z_dim = z_dim;
 
 				m_scale = size;
+
+                m_propertyBlock = new MaterialPropertyBlock();
+                m_propertyBlock.SetMatrix("_ObjectToWorld", m_chunkTransform.localToWorldMatrix);
+                m_bounds = new Bounds((m_chunkTransform.position + new Vector3(m_x_dim / 2, m_y_dim / 2, m_z_dim / 2)) * m_scale, new Vector3(m_x_dim, m_y_dim, m_z_dim) * m_scale);
 
 				//MarchingCubes
 				//tables
@@ -121,6 +125,12 @@ namespace ProceduralTerrain
 
                 //max verts
                 m_maxVertices = m_x_lod_dim * m_y_lod_dim * m_z_lod_dim * 5 * 3;
+               /* m_dummyMesh = new Mesh()
+                {
+                    vertices = new Vector3[m_maxVertices],
+                    bounds = new Bounds(m_chunkPosition + new Vector3(m_x_dim / 2, m_y_dim / 2, m_z_dim / 2), new Vector3(m_x_dim / 2, m_y_dim / 2, m_z_dim / 2))
+                };*/
+                
 
                 //output mesh. 
                 if(m_meshBuffer != null) m_meshBuffer.Release();
@@ -160,7 +170,7 @@ namespace ProceduralTerrain
                 m_calculateNormalsShader.Dispatch(0, m_x_dim / 8, m_y_dim / 8, m_z_dim / 8);
 
                 //Initalize MC
-                m_MCRenderShader.SetFloats("_ChunkPosition", new float[] { chunkPosition.x, chunkPosition.y, chunkPosition.z });
+                //m_MCRenderShader.SetFloats("_ChunkPosition", new float[] { chunkPosition.x, chunkPosition.y, chunkPosition.z });
                 m_MCRenderShader.SetFloat("_DensityOffset", m_offset);
                 m_MCRenderShader.SetTexture(0, "_Normals", m_normalsTexture);
                 m_MCRenderShader.SetBuffer(0, "_Vertices", m_meshBuffer);
@@ -204,22 +214,12 @@ namespace ProceduralTerrain
                 m_calculateNormalsShader.SetInt("_z", m_z_dim);
             }
 
-            public void DrawMesh(Camera camera)
-            {
-               m_meshMaterial.SetBuffer("_MeshBuffer", m_meshBuffer);
-                m_meshMaterial.SetPass(0);
-                Graphics.DrawProceduralNow(MeshTopology.Triangles, m_maxVertices);
-                
-            }
-
             public void DrawMesh()
             {
-                m_meshMaterial.SetBuffer("_MeshBuffer", m_meshBuffer);
-                m_meshMaterial.SetPass(0);
-                Graphics.DrawProcedural(m_meshMaterial,
-                                        new Bounds(m_chunkPosition + new Vector3(m_x_dim / 2, m_y_dim / 2, m_z_dim / 2), new Vector3(m_x_dim / 2, m_y_dim / 2, m_z_dim / 2)),
-                                        MeshTopology.Triangles, m_maxVertices,1, null, null, UnityEngine.Rendering.ShadowCastingMode.TwoSided, true, m_layer);
+                m_propertyBlock.SetBuffer("_MeshBuffer", m_meshBuffer);
+                Graphics.DrawProcedural(m_meshMaterial, m_bounds, MeshTopology.Triangles, m_maxVertices, 1, null, m_propertyBlock, UnityEngine.Rendering.ShadowCastingMode.TwoSided);
             }
+
 
 
             public void InitalizeColliderCompute(int x_dim, int y_dim, int z_dim, float size)
