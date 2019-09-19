@@ -7,17 +7,15 @@ using ProceduralTerrain.MarchingCubes;
 
 public unsafe class PlanetChunk : MonoBehaviour
 {
-	
-	public bool showNormals = false;
-	public bool refresh = true;
-    public bool continousRefresh = false;
+    public bool drawChunkBorders = false;
+    public bool drawBoundingBoxe = false;
+    public bool drawCenter = false;
 	
 	//chunk info
 	int m_id;
 	int m_res;
 	int m_res2;
 	float m_scale;
-    Vector3 m_center;
 
     //Environment
     private Planet m_planet;
@@ -51,7 +49,7 @@ public unsafe class PlanetChunk : MonoBehaviour
     private void Update()
 	{
 
-        float playerDistance = Vector3.Distance(m_player.position, m_center);
+        float playerDistance = Vector3.Distance(m_player.position, transform.position);
         if(playerDistance > m_lod3Distance && m_lod != 3) RefreshMesh(3);
         else if(playerDistance <= m_lod3Distance && playerDistance > m_lod2Distance && m_lod != 2) RefreshMesh(2);
         else if(playerDistance <= m_lod2Distance && playerDistance > m_lod1Distance && m_lod != 1) RefreshMesh(1);
@@ -60,14 +58,11 @@ public unsafe class PlanetChunk : MonoBehaviour
         m_mcRender.DrawMesh();
 	}
 
-	private void OnValidate()
-	{
-		if(showNormals) DrawNormals();
-	}
-
     private void OnDrawGizmos()
     {
-        Gizmos.DrawWireCube(m_mcRender.m_bounds.center, m_mcRender.m_bounds.size);
+        if(drawChunkBorders) { Gizmos.color = Color.green; Gizmos.DrawWireCube(transform.position, Vector3.one * m_res * m_scale); }
+        if(drawBoundingBoxe) { Gizmos.color = Color.white; Gizmos.DrawWireCube(m_mcRender.m_bounds.center, m_mcRender.m_bounds.size); };
+        if(drawCenter) { Gizmos.color = Color.red; Gizmos.DrawSphere(transform.position, 2f * m_scale); }
     }
 
     private void OnDestroy()
@@ -76,13 +71,12 @@ public unsafe class PlanetChunk : MonoBehaviour
         m_mcCollider.Release();
 	}
 
-	public void Initalize(int id, int res, float scale, bool sharpEdges)
+	public void Initalize(int id, int res, float scale, bool shaded)
 	{
 		m_id = id;
 		m_res = res;
 		m_res2 = m_res * m_res;
 		m_scale = scale;
-        //m_center = transform.TransformPoint(new Vector3((float)m_res / 2, (float)m_res / 2, (float)m_res / 2));
 
         m_neighbourChunks = new PlanetChunk[27];
 
@@ -95,7 +89,7 @@ public unsafe class PlanetChunk : MonoBehaviour
             m_clearVerticesShader = m_ClearVerticesShader,
             m_calculateNormalsShader = m_CalculateNormalsShader,
             m_meshMaterial = m_meshMaterial,
-            m_recalculateNormals = sharpEdges,
+            m_recalculateNormals = !shaded,
             m_chunkTransform = transform
 		};
         m_mcRender.InitalizeRenderMesh(m_res, m_res, m_res, m_scale);
@@ -129,7 +123,7 @@ public unsafe class PlanetChunk : MonoBehaviour
             m_lod = lod;
             m_mcRender.SetLOD(m_lod);
         }
-        m_mcRender.ComputeRenderMesh(m_densityMap, m_borderMaps, transform.position);
+        m_mcRender.ComputeRenderMesh(m_densityMap, m_borderMaps);
     }
 
     public void RefreshCollider()

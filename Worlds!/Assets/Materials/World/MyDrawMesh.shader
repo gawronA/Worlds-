@@ -2,7 +2,7 @@
 {
     SubShader
     {
-		Cull off
+		Cull back
         Pass
         {
             CGPROGRAM
@@ -17,8 +17,9 @@
 			};
 
 			uniform StructuredBuffer<Vertex> _MeshBuffer;
-
 			uniform float4x4 _ObjectToWorld;
+			uniform float4 _Offset;
+			uniform float _Scale;
 
             struct v2f
             {
@@ -30,7 +31,7 @@
             v2f vert (uint id : SV_VertexID)
             {
 				v2f o;
-				float4 worldPos = mul(_ObjectToWorld, float4(_MeshBuffer[id].position.xyz, 1.0f));
+				float4 worldPos = mul(_ObjectToWorld, float4(_MeshBuffer[id].position.xyz, 1.0f) - _Offset * _Scale);
                 o.vertex = UnityObjectToClipPos(worldPos);
 				o.color = dot(float3(0, 1, 0), _MeshBuffer[id].normal) * 0.5 + 0.5;
                 return o;

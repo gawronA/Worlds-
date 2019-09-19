@@ -71,6 +71,7 @@ namespace ProceduralTerrain
 				if(m_MCRenderShader == null) throw new System.ArgumentException("Missing MCRenderShader");
 				if(m_clearVerticesShader == null) throw new System.ArgumentException("Missing ClearVerticesShader");
 				if(m_calculateNormalsShader == null) throw new System.ArgumentException("Missing CalculateNormalsShader");
+                if(m_meshMaterial == null) Debug.LogWarning("Missing mesh material");
 
 				m_x_dim = x_dim;
 				m_y_dim = y_dim;
@@ -78,9 +79,13 @@ namespace ProceduralTerrain
 
 				m_scale = size;
 
+                //m_meshMaterial.SetVector("_Offset", new Vector4(m_x_dim / 2, m_y_dim / 2, m_z_dim / 2, 0f));
+                //m_meshMaterial.SetFloat("_Scale", m_scale);
+
                 m_propertyBlock = new MaterialPropertyBlock();
                 m_propertyBlock.SetMatrix("_ObjectToWorld", m_chunkTransform.localToWorldMatrix);
-                m_bounds = new Bounds((m_chunkTransform.position + new Vector3(m_x_dim / 2, m_y_dim / 2, m_z_dim / 2)) * m_scale, new Vector3(m_x_dim, m_y_dim, m_z_dim) * m_scale);
+                //m_bounds = new Bounds(m_chunkTransform.position + (new Vector3(m_x_dim / 2, m_y_dim / 2, m_z_dim / 2) * m_scale), new Vector3(m_x_dim, m_y_dim, m_z_dim) * m_scale);
+                m_bounds = new Bounds();
 
 				//MarchingCubes
 				//tables
@@ -142,7 +147,7 @@ namespace ProceduralTerrain
                 InitRenderMesh();
             }
 
-            public void ComputeRenderMesh(float[] densityMap, BorderDensities maps, Vector3 chunkPosition)
+            public void ComputeRenderMesh(float[] densityMap, BorderDensities maps)
             {
                 m_densityBuffer.SetData(densityMap);
                 m_ChunkXdensityBuffer.SetData(maps.borderMapx);
@@ -217,6 +222,10 @@ namespace ProceduralTerrain
             public void DrawMesh()
             {
                 m_propertyBlock.SetBuffer("_MeshBuffer", m_meshBuffer);
+                m_propertyBlock.SetMatrix("_ObjectToWorld", m_chunkTransform.localToWorldMatrix);
+                m_bounds.center = m_chunkTransform.position/* + (new Vector3(m_x_dim / 2, m_y_dim / 2, m_z_dim / 2) * m_scale)*/;
+                m_bounds.size = new Vector3(m_x_dim, m_y_dim, m_z_dim) * 1.73f * m_scale;
+
                 Graphics.DrawProcedural(m_meshMaterial, m_bounds, MeshTopology.Triangles, m_maxVertices, 1, null, m_propertyBlock, UnityEngine.Rendering.ShadowCastingMode.TwoSided);
             }
 
@@ -292,7 +301,6 @@ namespace ProceduralTerrain
                 //receive the verts
                 Vertex[] receivedData = new Vertex[m_maxVertices];
 				List<Vector3> vertices = new List<Vector3>();
-				List<Vector3> normals = new List<Vector3>();
 				List<int> triangles = new List<int>();
 				Mesh mesh = new Mesh();
 
@@ -301,7 +309,7 @@ namespace ProceduralTerrain
 				{
 					if(receivedData[i].position.w != -1.0f)
 					{
-						vertices.Add(new Vector3(receivedData[i].position.x, receivedData[i].position.y, receivedData[i].position.z));
+                        vertices.Add(new Vector3(receivedData[i].position.x, receivedData[i].position.y, receivedData[i].position.z) - new Vector3(m_x_dim / 2, m_y_dim / 2, m_z_dim / 2) * m_scale);
 						triangles.Add(idx++);
 					}
 				}
