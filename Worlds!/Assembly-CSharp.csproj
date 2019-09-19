@@ -78,6 +78,7 @@
     <Compile Include="Assets\Scripts\ShaderTutorial\Part 1 Matrices\Transformation.cs" />
     <Compile Include="Assets\Scripts\ShaderTutorial\Part 1 Matrices\TransformationGrid.cs" />
     <Compile Include="Assets\Scripts\World\DensityMapTexture.cs" />
+    <Compile Include="Assets\Scripts\World\GeographicCoordinate.cs" />
     <Compile Include="Assets\Scripts\World\Planet.cs" />
     <Compile Include="Assets\Scripts\World\PlanetChunk.cs" />
     <Compile Include="Assets\Scripts\World\PlanetGenerator.cs" />

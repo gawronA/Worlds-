@@ -469,7 +469,7 @@ Camera:
   m_GameObject: {fileID: 534669902}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 1
+  m_ClearFlags: 2
   m_BackGroundColor: {r: 0, g: 0, b: 0, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
@@ -580,7 +580,7 @@ MonoBehaviour:
   m_scale: 5
   m_xyzResolution: 16
   m_shaded: 0
-  m_position: {x: 0, y: 0, z: 0}
+  m_position: {x: -20, y: 0, z: 0}
   m_planetMaterial: {fileID: 2100000, guid: d77459f1d283e81468c2a8483f53ec42, type: 2}
   m_planetPrefab: {fileID: 1800079048482476, guid: 10b88e84e1d50274a818277016a46396,
     type: 3}

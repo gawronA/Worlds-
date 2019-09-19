@@ -23,7 +23,8 @@ public class PlanetGenerator : MonoBehaviour
 
 	[HideInInspector] public float[] m_densityMap;
 
-	void Awake()
+
+    void Awake()
 	{
 		int length = 2 * m_est_border + 2 * m_radius;
 		m_chunk_count = Mathf.CeilToInt((float)length / m_xyzResolution);
@@ -75,7 +76,7 @@ public class PlanetGenerator : MonoBehaviour
 
 					GameObject chunkObj = Instantiate(m_planetChunkPrefab, planetObj.transform, false);
 					chunkObj.name = planetObj.name + "_chunk" + id.ToString();
-					chunkObj.transform.position = (chunk_offset + new Vector3(c_x * m_xyzResolution, c_y * m_xyzResolution, c_z * m_xyzResolution)) * m_scale;
+					chunkObj.transform.position = planetObj.transform.position + (chunk_offset + new Vector3(c_x * m_xyzResolution, c_y * m_xyzResolution, c_z * m_xyzResolution)) * m_scale;
 					planet.AddChunk(chunkObj);
 
 					PlanetChunk chunk = chunkObj.GetComponent<PlanetChunk>();

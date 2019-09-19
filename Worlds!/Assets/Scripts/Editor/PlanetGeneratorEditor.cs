@@ -17,6 +17,7 @@ public class PlanetGeneratorEditor : Editor
 
     int m_border;
 
+    GeographicCoordinate coords;
     private void OnEnable()
     {
         m_radius = serializedObject.FindProperty("m_radius");
@@ -32,6 +33,8 @@ public class PlanetGeneratorEditor : Editor
         int length = 2 * m_est_border.intValue + 2 * m_radius.intValue;
         int m_chunk_count = Mathf.CeilToInt((float)length / m_xyzResolution.intValue);
         m_border = (m_chunk_count * m_xyzResolution.intValue) / 2 - m_radius.intValue;
+
+        coords = new GeographicCoordinate();
     }
 
     public override void OnInspectorGUI()
@@ -61,5 +64,10 @@ public class PlanetGeneratorEditor : Editor
         EditorGUILayout.PropertyField(m_planetMaterial, new GUIContent("Planet material"));
 
         serializedObject.ApplyModifiedProperties();
+
+        coords.PhiDeg = EditorGUILayout.Slider(new GUIContent("Phi Deg"), coords.PhiDeg, -1080f, 1080f);
+        EditorGUILayout.LabelField(new GUIContent("Phi Deg" + coords.PhiDeg.ToString() + "  Phi Rad" + coords.PhiRad));
+        coords.LambdaDeg = EditorGUILayout.Slider(new GUIContent("Lambda Deg"), coords.LambdaDeg, -1080f, 1080f);
+        EditorGUILayout.LabelField(new GUIContent("Lambda Deg" + coords.LambdaDeg.ToString() + "  Lambda Rad" + coords.LambdaRad));
     }
 }
