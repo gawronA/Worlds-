@@ -64,7 +64,9 @@ public class PlanetGenerator : MonoBehaviour
 		Planet planet = planetObj.GetComponent<Planet>();
 		planet.Initalize(m_chunk_count, m_xyzResolution);
 
-        Vector3 chunk_offset = Vector3.one * (m_xyzResolution * m_chunk_count / -2f + 0.5f * m_xyzResolution)/* * m_scale*/;
+        Vector3 chunk_offset = Vector3.one * (m_xyzResolution * m_chunk_count / -2f + 0.5f * m_xyzResolution);
+        Vector3 lambda_center = new Vector3(m_xyzResolution / 2, 0, m_xyzResolution / 2);
+        Vector3 phi_center = new Vector3(0, m_xyzResolution / 2, m_xyzResolution / 2);
 
         for(int c_z = 0, id = 0; c_z < m_chunk_count; c_z++)
 		{
@@ -82,8 +84,26 @@ public class PlanetGenerator : MonoBehaviour
 					PlanetChunk chunk = chunkObj.GetComponent<PlanetChunk>();
                     chunk.m_meshMaterial = m_planetMaterial;
                     chunk.Initalize(id, m_xyzResolution, m_scale, m_shaded);
-					
-					float[] densityMap = new float[m_xyzResolution * m_xyzResolution * m_xyzResolution];
+
+                    chunk.m_geo[0].LambdaDeg =  Vector3.SignedAngle(Vector3.back, new Vector3(c_x * m_xyzResolution, 0, c_z * m_xyzResolution) - lambda_center, Vector3.down);
+                    chunk.m_geo[0].PhiDeg = Vector3.SignedAngle(Vector3.back, new Vector3(0, c_y * m_xyzResolution, c_z * m_xyzResolution) - phi_center, Vector3.right);
+                    chunk.m_geo[1].LambdaDeg = Vector3.SignedAngle(Vector3.back, new Vector3((c_x + 1) * m_xyzResolution, 0, c_z * m_xyzResolution) - lambda_center, Vector3.down);
+                    chunk.m_geo[1].PhiDeg = Vector3.SignedAngle(Vector3.back, new Vector3(0, c_y * m_xyzResolution, c_z * m_xyzResolution) - phi_center, Vector3.right);
+                    chunk.m_geo[2].LambdaDeg = Vector3.SignedAngle(Vector3.back, new Vector3(c_x * m_xyzResolution, 0, c_z * m_xyzResolution) - lambda_center, Vector3.down);
+                    chunk.m_geo[2].PhiDeg = Vector3.SignedAngle(Vector3.back, new Vector3(0, (c_y + 1) * m_xyzResolution, c_z * m_xyzResolution) - phi_center, Vector3.right);
+                    chunk.m_geo[3].LambdaDeg = Vector3.SignedAngle(Vector3.back, new Vector3((c_x + 1) * m_xyzResolution, 0, c_z * m_xyzResolution) - lambda_center, Vector3.down);
+                    chunk.m_geo[3].PhiDeg = Vector3.SignedAngle(Vector3.back, new Vector3(0, (c_y + 1) * m_xyzResolution, c_z * m_xyzResolution) - phi_center, Vector3.right);
+                    chunk.m_geo[4].LambdaDeg = Vector3.SignedAngle(Vector3.back, new Vector3(c_x * m_xyzResolution, 0, (c_z + 1) * m_xyzResolution) - lambda_center, Vector3.down);
+                    chunk.m_geo[4].PhiDeg = Vector3.SignedAngle(Vector3.back, new Vector3(0, c_y * m_xyzResolution, (c_z + 1) * m_xyzResolution) - phi_center, Vector3.right);
+                    chunk.m_geo[5].LambdaDeg = Vector3.SignedAngle(Vector3.back, new Vector3((c_x + 1) * m_xyzResolution, 0, (c_z + 1) * m_xyzResolution) - lambda_center, Vector3.down);
+                    chunk.m_geo[5].PhiDeg = Vector3.SignedAngle(Vector3.back, new Vector3(0, c_y * m_xyzResolution, (c_z + 1) * m_xyzResolution) - phi_center, Vector3.right);
+                    chunk.m_geo[6].LambdaDeg = Vector3.SignedAngle(Vector3.back, new Vector3(c_x * m_xyzResolution, 0, (c_z + 1) * m_xyzResolution) - lambda_center, Vector3.down);
+                    chunk.m_geo[6].PhiDeg = Vector3.SignedAngle(Vector3.back, new Vector3(0, (c_y + 1) * m_xyzResolution, (c_z + 1) * m_xyzResolution) - phi_center, Vector3.right);
+                    chunk.m_geo[7].LambdaDeg = Vector3.SignedAngle(Vector3.back, new Vector3((c_x + 1) * m_xyzResolution, 0, (c_z + 1) * m_xyzResolution) - lambda_center, Vector3.down);
+                    chunk.m_geo[7].PhiDeg = Vector3.SignedAngle(Vector3.back, new Vector3(0, (c_y + 1) * m_xyzResolution, (c_z + 1) * m_xyzResolution) - phi_center, Vector3.right);
+
+
+                    float[] densityMap = new float[m_xyzResolution * m_xyzResolution * m_xyzResolution];
 					for(int z = 0; z < m_xyzResolution; z++)
 					{
 						for(int y = 0; y < m_xyzResolution; y++)

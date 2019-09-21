@@ -16,6 +16,7 @@ public unsafe class PlanetChunk : MonoBehaviour
 	int m_res;
 	int m_res2;
 	float m_scale;
+    public GeographicCoordinate[] m_geo;
 
     //Environment
     private Planet m_planet;
@@ -77,6 +78,8 @@ public unsafe class PlanetChunk : MonoBehaviour
 		m_res = res;
 		m_res2 = m_res * m_res;
 		m_scale = scale;
+        m_geo = new GeographicCoordinate[8];
+        for(int i = 0; i < m_geo.Length; i++) m_geo[i] = new GeographicCoordinate();
 
         m_neighbourChunks = new PlanetChunk[27];
 
