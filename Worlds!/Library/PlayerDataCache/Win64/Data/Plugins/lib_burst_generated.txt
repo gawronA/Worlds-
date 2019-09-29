@@ -11,9 +11,9 @@
 --root-assembly=D:\Unity\Projects\Worlds!\Worlds!\Temp\StagingArea\Data\Managed\com.unity.multiplayer-hlapi.Runtime.dll
 --root-assembly=D:\Unity\Projects\Worlds!\Worlds!\Temp\StagingArea\Data\Managed\Unity.TextMeshPro.dll
 --root-assembly=D:\Unity\Projects\Worlds!\Worlds!\Temp\StagingArea\Data\Managed\Unity.Timeline.dll
+--root-assembly=D:\Unity\Projects\Worlds!\Worlds!\Temp\StagingArea\Data\Managed\Assembly-CSharp.dll
 --root-assembly=D:\Unity\Projects\Worlds!\Worlds!\Temp\StagingArea\Data\Managed\Unity.Mathematics.dll
 --root-assembly=D:\Unity\Projects\Worlds!\Worlds!\Temp\StagingArea\Data\Managed\Unity.Analytics.DataPrivacy.dll
---root-assembly=D:\Unity\Projects\Worlds!\Worlds!\Temp\StagingArea\Data\Managed\Assembly-CSharp.dll
 --root-assembly=D:\Unity\Projects\Worlds!\Worlds!\Temp\StagingArea\Data\Managed\UnityEngine.XR.LegacyInputHelpers.dll
 --root-assembly=D:\Unity\Projects\Worlds!\Worlds!\Temp\StagingArea\Data\Managed\Unity.Burst.dll
 --root-assembly=D:\Unity\Projects\Worlds!\Worlds!\Temp\StagingArea\Data\Managed\UnityEngine.SpatialTracking.dll

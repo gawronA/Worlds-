@@ -1,13 +1,14 @@
 ScriptsOnlyBuild:
   usedScripts:
     Assembly-CSharp.dll:
+    - CameraPostRender
     - DensityMapTexture
     - ExtendedFlycam
+    - FPSmeter
     - NoiseTextureCreator
     - Planet
     - PlanetChunk
     - PlanetGenerator
-    - PositionChanger
     Unity.2D.Tilemap.Editor.dll:
     - UnityEditor.Tilemaps.GridPaintingState
     - UnityEditor.Tilemaps.GridPaletteBrushes
@@ -17,6 +18,12 @@ ScriptsOnlyBuild:
     UnityEditor.TestRunner.dll:
     - UnityEditor.TestTools.TestRunner.Api.CallbacksHolder
     - UnityEditor.TestTools.TestRunner.TestListCacheData
+    UnityEngine.UI.dll:
+    - UnityEngine.EventSystems.EventSystem
+    - UnityEngine.EventSystems.StandaloneInputModule
+    - UnityEngine.UI.CanvasScaler
+    - UnityEngine.UI.GraphicRaycaster
+    - UnityEngine.UI.Text
     com.unity.multiplayer-hlapi.Runtime.dll:
     - UnityEngine.Networking.NetworkCallbacks
     - UnityEngine.Networking.NetworkIdentity
@@ -55,42 +62,62 @@ ScriptsOnlyBuild:
     - Class: 108
       Script: {instanceID: 0}
     - Class: 114
-      Script: {instanceID: 9762}
+      Script: {instanceID: 9724}
     - Class: 114
-      Script: {instanceID: 9890}
+      Script: {instanceID: 9738}
     - Class: 114
-      Script: {instanceID: 9894}
+      Script: {instanceID: 9770}
     - Class: 114
-      Script: {instanceID: 9988}
+      Script: {instanceID: 9898}
     - Class: 114
-      Script: {instanceID: 10018}
+      Script: {instanceID: 9902}
     - Class: 114
-      Script: {instanceID: 10154}
+      Script: {instanceID: 9982}
     - Class: 114
-      Script: {instanceID: 10284}
+      Script: {instanceID: 9996}
     - Class: 114
-      Script: {instanceID: 10458}
+      Script: {instanceID: 10026}
     - Class: 114
-      Script: {instanceID: 10678}
+      Script: {instanceID: 10162}
     - Class: 114
-      Script: {instanceID: 10866}
+      Script: {instanceID: 10294}
     - Class: 114
-      Script: {instanceID: 11172}
+      Script: {instanceID: 10468}
     - Class: 114
-      Script: {instanceID: 11716}
+      Script: {instanceID: 10634}
     - Class: 114
-      Script: {instanceID: 11718}
+      Script: {instanceID: 10658}
     - Class: 114
-      Script: {instanceID: 11932}
+      Script: {instanceID: 10690}
     - Class: 114
-      Script: {instanceID: 12152}
+      Script: {instanceID: 10878}
+    - Class: 114
+      Script: {instanceID: 11184}
+    - Class: 114
+      Script: {instanceID: 11730}
+    - Class: 114
+      Script: {instanceID: 11732}
+    - Class: 114
+      Script: {instanceID: 11950}
+    - Class: 114
+      Script: {instanceID: 12168}
+    - Class: 114
+      Script: {instanceID: 12500}
     - Class: 115
+      Script: {instanceID: 0}
+    - Class: 128
       Script: {instanceID: 0}
     - Class: 135
       Script: {instanceID: 0}
     - Class: 136
       Script: {instanceID: 0}
     - Class: 157
+      Script: {instanceID: 0}
+    - Class: 222
+      Script: {instanceID: 0}
+    - Class: 223
+      Script: {instanceID: 0}
+    - Class: 224
       Script: {instanceID: 0}
     - Class: 258
       Script: {instanceID: 0}
@@ -101,6 +128,12 @@ ScriptsOnlyBuild:
     assemblyName: UnityEngine.UI.dll
     namespaceName: UnityEngine.UI
     className: CanvasScaler
+  - hash:
+      serializedVersion: 2
+      Hash: 71bb6a6b6c8f052f948db64c7dd3ca4f
+    assemblyName: Assembly-CSharp.dll
+    namespaceName: 
+    className: CameraPostRender
   - hash:
       serializedVersion: 2
       Hash: 984dcc0ba3707b7691fbdca8ff508d28
@@ -217,7 +250,7 @@ ScriptsOnlyBuild:
     className: GridLayoutGroup
   - hash:
       serializedVersion: 2
-      Hash: 71bb6a6b6c8f052f948db64c7dd3ca4f
+      Hash: 1c4f5f427dc917ad1a8586dabccf0f3a
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: Planet
@@ -343,7 +376,7 @@ ScriptsOnlyBuild:
     className: ControlPlayableAsset
   - hash:
       serializedVersion: 2
-      Hash: 27c4c90f331bbbb0ff401050dda36ca0
+      Hash: 3ccba316420b8e3729355b3485864d50
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: PlanetChunk
@@ -385,7 +418,7 @@ ScriptsOnlyBuild:
     className: NetworkTransformVisualizer
   - hash:
       serializedVersion: 2
-      Hash: 666e8d7d9e3eae7e1f9d6fc7f011cba8
+      Hash: e49fddac9fd2445890785bcaa3ac9b88
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: PlanetGenerator

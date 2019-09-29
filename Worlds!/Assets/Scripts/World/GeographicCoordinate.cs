@@ -4,26 +4,49 @@ using UnityEngine;
 
 public class GeographicCoordinate
 {
-    private float m_lambda;
+    private float m_theta;
     private float m_phi;
     public float Radius { get; set; }
 
-    public float LambdaRad
+    /// <summary>
+    /// A point in Cartesian System
+    /// </summary>
+    public Vector3 Point
     {
         get
         {
-            return m_lambda;
+            return new Vector3( Radius * Mathf.Sin(Phi) * Mathf.Cos(Theta),
+                                Radius * Mathf.Cos(Phi),
+                                Radius * Mathf.Sin(Phi) * Mathf.Sin(Theta));
         }
         set
         {
-            int period_count = 0;
-            if(value > Mathf.PI) period_count = (int)((value + Mathf.PI) / (2 * Mathf.PI));
-            else if(value <= -Mathf.PI) period_count = (int)((value - Mathf.PI) / (2 * Mathf.PI));
-            m_lambda = value - period_count * 2 * Mathf.PI;
+            Radius = Mathf.Sqrt(Mathf.Pow(value.x, 2) + Mathf.Pow(value.y, 2) + Mathf.Pow(value.z, 2));
+            if(value.x == 0f) Theta = value.z > 0f ? Mathf.PI / 2f : Mathf.PI* 3f / 2f;
+            else Theta = Wrap2PI(Mathf.Atan2(value.z, value.x));
+            Phi = Radius == 0f ? 0f : WrapPI(Mathf.Acos(value.y / Radius));
         }
     }
 
-    public float PhiRad
+    /// <summary>
+    /// Azimuth (longitude) in radians
+    /// </summary>
+    public float Theta
+    {
+        get
+        {
+            return m_theta;
+        }
+        set
+        {
+            m_theta = Wrap2PI(value);
+        }
+    }
+
+    /// <summary>
+    /// Inclination (latitude) in radians
+    /// </summary>
+    public float Phi
     {
         get
         {
@@ -31,25 +54,33 @@ public class GeographicCoordinate
         }
         set
         {
-            int period_count = 0;
-            if(value > Mathf.PI) period_count = (int)((value + Mathf.PI) / (2 * Mathf.PI));
-            else if(value <= -Mathf.PI) period_count = (int)((value - Mathf.PI) / (2 * Mathf.PI));
-            m_phi = value - period_count * 2 * Mathf.PI;
+            float abs_value = Mathf.Abs(value);
+            int period_count = Mathf.FloorToInt(abs_value / Mathf.PI);
+            m_phi = period_count % 2 == 1 ? (period_count + 1) * Mathf.PI - abs_value : abs_value - period_count * Mathf.PI;
+
+            Theta += Mathf.FloorToInt(value / Mathf.PI) * Mathf.PI;
+            //m_phi = WrapPI(value);
         }
     }
 
-    public float LambdaDeg
+    /// <summary>
+    /// Longitude in degrees
+    /// </summary>
+    public float ThetaDeg
     {
         get
         {
-            return m_lambda * Mathf.Rad2Deg;
+            return m_theta * Mathf.Rad2Deg;
         }
         set
         {
-            LambdaRad = value * Mathf.Deg2Rad;
+            Theta = value * Mathf.Deg2Rad;
         }
     }
 
+    /// <summary>
+    /// Latitude in degrees
+    /// </summary>
     public float PhiDeg
     {
         get
@@ -58,10 +89,30 @@ public class GeographicCoordinate
         }
         set
         {
-            PhiRad = value * Mathf.Deg2Rad;
+            Phi = value * Mathf.Deg2Rad;
         }
     }
 
-    
+    /// <summary>
+    /// Ensures that alpha stays within [0, 2PI) range
+    /// </summary>
+    /// <param name="alpha"></param>
+    /// <returns></returns>
+    public static float Wrap2PI(float alpha)
+    {
+        int period_count = Mathf.FloorToInt(alpha / (2 * Mathf.PI));
+        return alpha - period_count * 2 * Mathf.PI;
+    }
 
+    /// <summary>
+    /// Ensures that alpha stays within [0, PI] range
+    /// </summary>
+    /// <param name="alpha"></param>
+    /// <returns></returns>
+    public static float WrapPI(float alpha)
+    {
+        float period_count = alpha / Mathf.PI;
+        period_count = period_count > 1f ? Mathf.Floor(period_count) : 0f;
+        return alpha - period_count * Mathf.PI;
+    }
 }

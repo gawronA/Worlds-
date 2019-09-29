@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Collections;
 using ProceduralTerrain.MarchingCubes;
+using UnityEngine.UI;
 
 
 public unsafe class PlanetChunk : MonoBehaviour
@@ -10,6 +11,8 @@ public unsafe class PlanetChunk : MonoBehaviour
     public bool drawChunkBorders = false;
     public bool drawBoundingBoxe = false;
     public bool drawCenter = false;
+    public bool drawCorners = false;
+    public bool drawCullVector = false;
 	
 	//chunk info
 	int m_id;
@@ -17,9 +20,16 @@ public unsafe class PlanetChunk : MonoBehaviour
 	int m_res2;
 	float m_scale;
     public GeographicCoordinate[] m_geo;
+    Vector3 m_cullVector;
 
     //Environment
-    private Planet m_planet;
+    struct PlanetInfo
+    {
+        public GameObject obj;
+        public Planet planetComp;
+    }
+
+    PlanetInfo m_planet;
     private PlanetChunk[] m_neighbourChunks;
     private Transform m_player;
 
@@ -56,7 +66,11 @@ public unsafe class PlanetChunk : MonoBehaviour
         else if(playerDistance <= m_lod2Distance && playerDistance > m_lod1Distance && m_lod != 1) RefreshMesh(1);
         else if(playerDistance <= m_lod1Distance && m_lod != 0) RefreshMesh(0);
 
-        m_mcRender.DrawMesh();
+        DrawMesh();
+        /*for(int i = 0; i < m_geo.Length; i++)
+        {
+            if(m_geo[i].Theta >= m_planet.planetComp.P1.Theta && m_geo[i].Theta <= m_planet.planetComp.P2.Theta) { DrawMesh(); break; }
+        }*/
 	}
 
     private void OnDrawGizmos()
@@ -64,6 +78,9 @@ public unsafe class PlanetChunk : MonoBehaviour
         if(drawChunkBorders) { Gizmos.color = Color.green; Gizmos.DrawWireCube(transform.position, Vector3.one * m_res * m_scale); }
         if(drawBoundingBoxe) { Gizmos.color = Color.white; Gizmos.DrawWireCube(m_mcRender.m_bounds.center, m_mcRender.m_bounds.size); };
         if(drawCenter) { Gizmos.color = Color.red; Gizmos.DrawSphere(transform.position, 2f * m_scale); }
+        if(drawCorners) { DrawVertexPoints(); }
+        if(drawCullVector) { Gizmos.color = Color.cyan; Gizmos.DrawLine(m_planet.obj.transform.position, (m_planet.obj.transform.position + m_cullVector) * 2f); }
+        //Gizmos.DrawSphere(m_planet)
     }
 
     private void OnDestroy()
@@ -72,7 +89,7 @@ public unsafe class PlanetChunk : MonoBehaviour
         m_mcCollider.Release();
 	}
 
-	public void Initalize(int id, int res, float scale, bool shaded)
+	public void Initalize(int id, int res, float scale, bool shaded, GameObject planetObj)
 	{
 		m_id = id;
 		m_res = res;
@@ -80,6 +97,13 @@ public unsafe class PlanetChunk : MonoBehaviour
 		m_scale = scale;
         m_geo = new GeographicCoordinate[8];
         for(int i = 0; i < m_geo.Length; i++) m_geo[i] = new GeographicCoordinate();
+        m_cullVector = transform.localPosition.normalized;
+
+        m_planet = new PlanetInfo()
+        {
+            obj = planetObj,
+            planetComp = planetObj.GetComponent<Planet>()
+        };
 
         m_neighbourChunks = new PlanetChunk[27];
 
@@ -127,6 +151,17 @@ public unsafe class PlanetChunk : MonoBehaviour
             m_mcRender.SetLOD(m_lod);
         }
         m_mcRender.ComputeRenderMesh(m_densityMap, m_borderMaps);
+    }
+
+    public void DrawMesh()
+    {
+        m_mcRender.SetBounds();
+
+        m_cullVector = (transform.position - m_planet.obj.transform.position);
+        //m_cullVector = (transform.rotation * transform.localPosition).normalized;
+        GameObject.FindGameObjectWithTag("DebugText").GetComponent<Text>().text = "Angle " + Vector3.Angle(m_planet.planetComp.m_player.obj.transform.position, m_cullVector).ToString();
+        if(Vector3.Angle(m_planet.planetComp.m_player.obj.transform.position, m_cullVector) <= 90f) m_mcRender.DrawMesh();
+        
     }
 
     public void RefreshCollider()
@@ -202,4 +237,13 @@ public unsafe class PlanetChunk : MonoBehaviour
 			Debug.DrawLine(transform.TransformPoint(m_meshFilter.mesh.vertices[i]), transform.TransformPoint(m_meshFilter.mesh.vertices[i] + m_meshFilter.mesh.normals[i]), Color.green, 120f);
 		}
 	}
+
+    void DrawVertexPoints()
+    {
+        Gizmos.color = Color.cyan;
+        for(int i = 0; i < m_geo.Length; i++)
+        {
+            Gizmos.DrawSphere(m_planet.obj.transform.TransformPoint(m_geo[i].Point), 1f);
+        }
+    }
 }

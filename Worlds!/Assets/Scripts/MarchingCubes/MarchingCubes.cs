@@ -219,12 +219,17 @@ namespace ProceduralTerrain
                 m_calculateNormalsShader.SetInt("_z", m_z_dim);
             }
 
+            public void SetBounds()
+            {
+                m_bounds.center = m_chunkTransform.position/* + (new Vector3(m_x_dim / 2, m_y_dim / 2, m_z_dim / 2) * m_scale)*/;
+                m_bounds.size = new Vector3(m_x_dim, m_y_dim, m_z_dim) * 1.73f * m_scale;
+            }
+
             public void DrawMesh()
             {
                 m_propertyBlock.SetBuffer("_MeshBuffer", m_meshBuffer);
                 m_propertyBlock.SetMatrix("_ObjectToWorld", m_chunkTransform.localToWorldMatrix);
-                m_bounds.center = m_chunkTransform.position/* + (new Vector3(m_x_dim / 2, m_y_dim / 2, m_z_dim / 2) * m_scale)*/;
-                m_bounds.size = new Vector3(m_x_dim, m_y_dim, m_z_dim) * 1.73f * m_scale;
+                m_propertyBlock.SetInt("_Lod", m_lod);
 
                 Graphics.DrawProcedural(m_meshMaterial, m_bounds, MeshTopology.Triangles, m_maxVertices, 1, null, m_propertyBlock, UnityEngine.Rendering.ShadowCastingMode.TwoSided);
             }
@@ -318,7 +323,6 @@ namespace ProceduralTerrain
 				mesh.SetTriangles(triangles, 0);
 
                 return mesh;
-                //return new Mesh();
 			}
 
             private void InitColliderMC()

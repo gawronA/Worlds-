@@ -10,6 +10,9 @@ public class PlanetGenerator : MonoBehaviour
 	public int m_xyzResolution = 16;
 	public bool m_shaded = false;
     public Vector3 m_position;
+    public float m_lod1;
+    public float m_lod2;
+    public float m_lod3;
     public Material m_planetMaterial;
 
 	public GameObject m_planetPrefab;
@@ -17,9 +20,10 @@ public class PlanetGenerator : MonoBehaviour
 
 	public /*only for debug*/int m_length;
 	int m_length2;
-	int m_border;
 	int m_chunk_count;
-	//Vector3Int center;
+
+    //some density-local-system crucial points
+    Vector3 m_planet_center;
 
 	[HideInInspector] public float[] m_densityMap;
 
@@ -31,7 +35,9 @@ public class PlanetGenerator : MonoBehaviour
 		m_length = m_chunk_count * m_xyzResolution;
 		m_length2 = m_length * m_length;
 
-		Vector3Int center = new Vector3Int(m_length / 2, m_length / 2, m_length / 2);
+        m_planet_center = Vector3.one * (m_xyzResolution * m_chunk_count) / 2;
+
+        Vector3Int center = new Vector3Int(m_length / 2, m_length / 2, m_length / 2);
 		m_densityMap = new float[m_length2 * m_length];
 		for(int z = 0; z < m_length; z++)
 		{
@@ -65,8 +71,6 @@ public class PlanetGenerator : MonoBehaviour
 		planet.Initalize(m_chunk_count, m_xyzResolution);
 
         Vector3 chunk_offset = Vector3.one * (m_xyzResolution * m_chunk_count / -2f + 0.5f * m_xyzResolution);
-        Vector3 lambda_center = new Vector3(m_xyzResolution / 2, 0, m_xyzResolution / 2);
-        Vector3 phi_center = new Vector3(0, m_xyzResolution / 2, m_xyzResolution / 2);
 
         for(int c_z = 0, id = 0; c_z < m_chunk_count; c_z++)
 		{
@@ -83,25 +87,12 @@ public class PlanetGenerator : MonoBehaviour
 
 					PlanetChunk chunk = chunkObj.GetComponent<PlanetChunk>();
                     chunk.m_meshMaterial = m_planetMaterial;
-                    chunk.Initalize(id, m_xyzResolution, m_scale, m_shaded);
+                    chunk.m_lod1Distance = m_lod1;
+                    chunk.m_lod2Distance = m_lod2;
+                    chunk.m_lod3Distance = m_lod3;
+                    chunk.Initalize(id, m_xyzResolution, m_scale, m_shaded, planetObj);
 
-                    chunk.m_geo[0].LambdaDeg =  Vector3.SignedAngle(Vector3.back, new Vector3(c_x * m_xyzResolution, 0, c_z * m_xyzResolution) - lambda_center, Vector3.down);
-                    chunk.m_geo[0].PhiDeg = Vector3.SignedAngle(Vector3.back, new Vector3(0, c_y * m_xyzResolution, c_z * m_xyzResolution) - phi_center, Vector3.right);
-                    chunk.m_geo[1].LambdaDeg = Vector3.SignedAngle(Vector3.back, new Vector3((c_x + 1) * m_xyzResolution, 0, c_z * m_xyzResolution) - lambda_center, Vector3.down);
-                    chunk.m_geo[1].PhiDeg = Vector3.SignedAngle(Vector3.back, new Vector3(0, c_y * m_xyzResolution, c_z * m_xyzResolution) - phi_center, Vector3.right);
-                    chunk.m_geo[2].LambdaDeg = Vector3.SignedAngle(Vector3.back, new Vector3(c_x * m_xyzResolution, 0, c_z * m_xyzResolution) - lambda_center, Vector3.down);
-                    chunk.m_geo[2].PhiDeg = Vector3.SignedAngle(Vector3.back, new Vector3(0, (c_y + 1) * m_xyzResolution, c_z * m_xyzResolution) - phi_center, Vector3.right);
-                    chunk.m_geo[3].LambdaDeg = Vector3.SignedAngle(Vector3.back, new Vector3((c_x + 1) * m_xyzResolution, 0, c_z * m_xyzResolution) - lambda_center, Vector3.down);
-                    chunk.m_geo[3].PhiDeg = Vector3.SignedAngle(Vector3.back, new Vector3(0, (c_y + 1) * m_xyzResolution, c_z * m_xyzResolution) - phi_center, Vector3.right);
-                    chunk.m_geo[4].LambdaDeg = Vector3.SignedAngle(Vector3.back, new Vector3(c_x * m_xyzResolution, 0, (c_z + 1) * m_xyzResolution) - lambda_center, Vector3.down);
-                    chunk.m_geo[4].PhiDeg = Vector3.SignedAngle(Vector3.back, new Vector3(0, c_y * m_xyzResolution, (c_z + 1) * m_xyzResolution) - phi_center, Vector3.right);
-                    chunk.m_geo[5].LambdaDeg = Vector3.SignedAngle(Vector3.back, new Vector3((c_x + 1) * m_xyzResolution, 0, (c_z + 1) * m_xyzResolution) - lambda_center, Vector3.down);
-                    chunk.m_geo[5].PhiDeg = Vector3.SignedAngle(Vector3.back, new Vector3(0, c_y * m_xyzResolution, (c_z + 1) * m_xyzResolution) - phi_center, Vector3.right);
-                    chunk.m_geo[6].LambdaDeg = Vector3.SignedAngle(Vector3.back, new Vector3(c_x * m_xyzResolution, 0, (c_z + 1) * m_xyzResolution) - lambda_center, Vector3.down);
-                    chunk.m_geo[6].PhiDeg = Vector3.SignedAngle(Vector3.back, new Vector3(0, (c_y + 1) * m_xyzResolution, (c_z + 1) * m_xyzResolution) - phi_center, Vector3.right);
-                    chunk.m_geo[7].LambdaDeg = Vector3.SignedAngle(Vector3.back, new Vector3((c_x + 1) * m_xyzResolution, 0, (c_z + 1) * m_xyzResolution) - lambda_center, Vector3.down);
-                    chunk.m_geo[7].PhiDeg = Vector3.SignedAngle(Vector3.back, new Vector3(0, (c_y + 1) * m_xyzResolution, (c_z + 1) * m_xyzResolution) - phi_center, Vector3.right);
-
+                    SetGeoCoords(chunk, c_x, c_y, c_z);
 
                     float[] densityMap = new float[m_xyzResolution * m_xyzResolution * m_xyzResolution];
 					for(int z = 0; z < m_xyzResolution; z++)
@@ -121,4 +112,41 @@ public class PlanetGenerator : MonoBehaviour
 		}
 		planet.AssignChunkNeighboursAndRefresh();
 	}
+
+    void SetGeoCoords(PlanetChunk chunk, int c_x, int c_y, int c_z)
+    {
+        chunk.m_geo[0].Point = new Vector3(c_x * m_xyzResolution, c_y * m_xyzResolution, c_z * m_xyzResolution) - m_planet_center;
+        chunk.m_geo[1].Point = new Vector3((c_x + 1)*m_xyzResolution, c_y * m_xyzResolution, c_z * m_xyzResolution) - m_planet_center;
+        chunk.m_geo[2].Point = new Vector3(c_x * m_xyzResolution, (c_y + 1) * m_xyzResolution, c_z * m_xyzResolution) - m_planet_center;
+        chunk.m_geo[3].Point = new Vector3((c_x + 1) * m_xyzResolution, (c_y + 1) * m_xyzResolution, c_z * m_xyzResolution) - m_planet_center;
+        chunk.m_geo[4].Point = new Vector3(c_x * m_xyzResolution, c_y * m_xyzResolution, (c_z + 1) * m_xyzResolution) - m_planet_center;
+        chunk.m_geo[5].Point = new Vector3((c_x + 1) * m_xyzResolution, c_y * m_xyzResolution, (c_z + 1) * m_xyzResolution) - m_planet_center;
+        chunk.m_geo[6].Point = new Vector3(c_x * m_xyzResolution, (c_y + 1) * m_xyzResolution, (c_z + 1) * m_xyzResolution) - m_planet_center;
+        chunk.m_geo[7].Point = new Vector3((c_x + 1) * m_xyzResolution, (c_y + 1) * m_xyzResolution, (c_z + 1) * m_xyzResolution) - m_planet_center;
+        /*chunk.m_geo[0].LambdaDeg = Vector3.SignedAngle(Vector3.back, new Vector3(c_x * m_xyzResolution, 0, c_z * m_xyzResolution) - m_lambda_center, Vector3.down);
+        chunk.m_geo[0].PhiDeg = Vector3.SignedAngle(Vector3.back, new Vector3(0, c_y * m_xyzResolution, c_z * m_xyzResolution) - m_phi_center, Vector3.right);
+        chunk.m_geo[0].Radius = Vector3.Distance(m_planet_center, new Vector3(c_x * m_xyzResolution, c_y * m_xyzResolution, c_z * m_xyzResolution));
+
+        chunk.m_geo[1].LambdaDeg = Vector3.SignedAngle(Vector3.back, new Vector3((c_x + 1) * m_xyzResolution, 0, c_z * m_xyzResolution) - m_lambda_center, Vector3.down);
+        chunk.m_geo[1].PhiDeg = Vector3.SignedAngle(Vector3.back, new Vector3(0, c_y * m_xyzResolution, c_z * m_xyzResolution) - m_phi_center, Vector3.right);
+        chunk.m_geo[1].Radius = Vector3.Distance(m_planet_center, new Vector3((c_x + 1) * m_xyzResolution, c_y * m_xyzResolution, c_z * m_xyzResolution));
+        chunk.m_geo[2].LambdaDeg = Vector3.SignedAngle(Vector3.back, new Vector3(c_x * m_xyzResolution, 0, c_z * m_xyzResolution) - m_lambda_center, Vector3.down);
+        chunk.m_geo[2].PhiDeg = Vector3.SignedAngle(Vector3.back, new Vector3(0, (c_y + 1) * m_xyzResolution, c_z * m_xyzResolution) - m_phi_center, Vector3.right);
+        chunk.m_geo[2].Radius = Vector3.Distance(m_planet_center, new Vector3(c_x * m_xyzResolution, (c_y + 1) * m_xyzResolution, c_z * m_xyzResolution));
+        chunk.m_geo[3].LambdaDeg = Vector3.SignedAngle(Vector3.back, new Vector3((c_x + 1) * m_xyzResolution, 0, c_z * m_xyzResolution) - m_lambda_center, Vector3.down);
+        chunk.m_geo[3].PhiDeg = Vector3.SignedAngle(Vector3.back, new Vector3(0, (c_y + 1) * m_xyzResolution, c_z * m_xyzResolution) - m_phi_center, Vector3.right);
+        chunk.m_geo[3].Radius = Vector3.Distance(m_planet_center, new Vector3((c_x + 1) * m_xyzResolution, (c_y + 1) * m_xyzResolution, c_z * m_xyzResolution));
+        chunk.m_geo[4].LambdaDeg = Vector3.SignedAngle(Vector3.back, new Vector3(c_x * m_xyzResolution, 0, (c_z + 1) * m_xyzResolution) - m_lambda_center, Vector3.down);
+        chunk.m_geo[4].PhiDeg = Vector3.SignedAngle(Vector3.back, new Vector3(0, c_y * m_xyzResolution, (c_z + 1) * m_xyzResolution) - m_phi_center, Vector3.right);
+        chunk.m_geo[4].Radius = Vector3.Distance(m_planet_center, new Vector3(c_x * m_xyzResolution, c_y * m_xyzResolution, (c_z + 1) * m_xyzResolution));
+        chunk.m_geo[5].LambdaDeg = Vector3.SignedAngle(Vector3.back, new Vector3((c_x + 1) * m_xyzResolution, 0, (c_z + 1) * m_xyzResolution) - m_lambda_center, Vector3.down);
+        chunk.m_geo[5].PhiDeg = Vector3.SignedAngle(Vector3.back, new Vector3(0, c_y * m_xyzResolution, (c_z + 1) * m_xyzResolution) - m_phi_center, Vector3.right);
+        chunk.m_geo[5].Radius = Vector3.Distance(m_planet_center, new Vector3((c_x + 1) * m_xyzResolution, c_y * m_xyzResolution, (c_z + 1) * m_xyzResolution));
+        chunk.m_geo[6].LambdaDeg = Vector3.SignedAngle(Vector3.back, new Vector3(c_x * m_xyzResolution, 0, (c_z + 1) * m_xyzResolution) - m_lambda_center, Vector3.down);
+        chunk.m_geo[6].PhiDeg = Vector3.SignedAngle(Vector3.back, new Vector3(0, (c_y + 1) * m_xyzResolution, (c_z + 1) * m_xyzResolution) - m_phi_center, Vector3.right);
+        chunk.m_geo[6].Radius = Vector3.Distance(m_planet_center, new Vector3(c_x * m_xyzResolution, (c_y + 1) * m_xyzResolution, (c_z + 1) * m_xyzResolution));
+        chunk.m_geo[7].LambdaDeg = Vector3.SignedAngle(Vector3.back, new Vector3((c_x + 1) * m_xyzResolution, 0, (c_z + 1) * m_xyzResolution) - m_lambda_center, Vector3.down);
+        chunk.m_geo[7].PhiDeg = Vector3.SignedAngle(Vector3.back, new Vector3(0, (c_y + 1) * m_xyzResolution, (c_z + 1) * m_xyzResolution) - m_phi_center, Vector3.right);
+        chunk.m_geo[7].Radius = Vector3.Distance(m_planet_center, new Vector3((c_x + 1) * m_xyzResolution, (c_y + 1) * m_xyzResolution, (c_z + 1) * m_xyzResolution));*/
+    }
 }
